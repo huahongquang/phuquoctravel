@@ -275,15 +275,30 @@ export default function BookingModal({
               <div className="receipt-tours-list">
                 <span className="field-label" style={{ marginBottom: "8px" }}>Chi tiết dịch vụ</span>
                 {bookingDetails.items.map((item, idx) => (
-                  <div key={idx} className="receipt-tour-row">
-                    <div>
-                      <span className="tour-name">{item.tourName}</span>
-                      <span className="tour-qty">({item.adults} NL, {item.children} TE)</span>
-                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
-                        Khởi hành: {new Date(item.date).toLocaleDateString("vi-VN")}
+                  <div key={idx} className="receipt-tour-row" style={{ flexDirection: "column", borderBottom: item.isCustom ? "1px dashed rgba(13, 44, 84, 0.1)" : "none", paddingBottom: item.isCustom ? "12px" : "0", marginBottom: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
+                      <div>
+                        <span className="tour-name" style={{ fontWeight: 600, color: "var(--primary)" }}>{item.tourName}</span>
+                        {!item.isCustom && <span className="tour-qty" style={{ color: "var(--text-muted)", marginLeft: "6px" }}>({item.adults} NL, {item.children} TE)</span>}
+                        <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                          {item.isCustom ? "Hành trình cá nhân hóa tự chọn" : `Khởi hành: ${new Date(item.date).toLocaleDateString("vi-VN")}`}
+                        </div>
                       </div>
+                      <span className="tour-price" style={{ fontWeight: 600 }}>{formatPrice(item.totalPrice)} đ</span>
                     </div>
-                    <span className="tour-price">{formatPrice(item.totalPrice)} đ</span>
+                    {item.isCustom && item.customItems && (
+                      <div style={{ background: "#f8fafc", padding: "10px 14px", borderRadius: "10px", marginTop: "8px", width: "100%", fontSize: "0.75rem", border: "1px solid rgba(13, 44, 84, 0.04)" }}>
+                        <strong style={{ color: "var(--primary)", display: "block", marginBottom: "6px" }}>Lịch trình chi tiết:</strong>
+                        <ul style={{ paddingLeft: "12px", listStyleType: "circle", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }}>
+                          {item.customItems.map((cItem, cIdx) => (
+                            <li key={cIdx} style={{ display: "flex", justifyContent: "space-between" }}>
+                              <span>{cItem.name}</span>
+                              <span style={{ fontWeight: 600 }}>{formatPrice(cItem.price)} đ</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

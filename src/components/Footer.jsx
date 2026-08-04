@@ -44,6 +44,11 @@ export default function Footer({ setActiveSection }) {
                 </a>
               </li>
               <li>
+                <a href="#builder" onClick={(e) => { e.preventDefault(); handleNavClick("builder"); }}>
+                  Tự Thiết Kế Tour
+                </a>
+              </li>
+              <li>
                 <a href="#transport" onClick={(e) => { e.preventDefault(); handleNavClick("transport"); }}>
                   Vé Máy Bay & Phà
                 </a>
