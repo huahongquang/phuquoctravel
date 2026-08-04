@@ -59,6 +59,11 @@ export default function App() {
 
   // Detect URL Affiliate query parameters (e.g. ?ref=NAM10 or ?aff=NAM10)
   useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
     const params = new URLSearchParams(window.location.search);
     const refParam = params.get("ref") || params.get("aff");
     if (refParam) {
