@@ -19,6 +19,7 @@ export default function AIChatbot({ onBookTour, language }) {
   const [inputVal, setInputVal] = useState("");
   const [recommendedAttractions, setRecommendedAttractions] = useState([]);
   const messagesEndRef = useRef(null);
+  const isFirstRender = useRef(true);
 
   // Sync welcome message on language change if no other message has been sent
   useEffect(() => {
@@ -38,6 +39,10 @@ export default function AIChatbot({ onBookTour, language }) {
   }, [language, isEn]);
 
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     scrollToBottom();
   }, [messages]);
 
