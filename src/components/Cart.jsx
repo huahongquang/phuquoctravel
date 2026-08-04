@@ -1,13 +1,18 @@
 import React from "react";
 import { X, Trash2, Calendar, Users, ShoppingBag } from "lucide-react";
+import { translations } from "../data/translations";
 
 export default function Cart({
   isOpen,
   onClose,
   cartItems,
   onRemoveItem,
-  onCheckoutClick
+  onCheckoutClick,
+  language
 }) {
+  const t = translations[language || "vi"];
+  const isEn = language === "en";
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN").format(price);
   };
@@ -20,7 +25,7 @@ export default function Cart({
         <div className="cart-header">
           <h3>
             <ShoppingBag size={22} />
-            Hành Trình Của Bạn
+            {t.cart_title}
           </h3>
           <button className="close-cart-btn" onClick={onClose}>
             <X size={24} />
@@ -31,9 +36,11 @@ export default function Cart({
           {cartItems.length === 0 ? (
             <div className="cart-empty">
               <ShoppingBag size={48} style={{ opacity: 0.3, marginBottom: "16px", color: "var(--primary)" }} />
-              <p>Hành trình của bạn đang trống.</p>
+              <p>{t.cart_empty}</p>
               <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "4px" }}>
-                Hãy chọn các tour du lịch trải nghiệm hoặc nhờ AI tư vấn để bắt đầu lên lịch trình nhé!
+                {isEn 
+                  ? "Select travel packages or ask our AI travel guide to start planning your vacation!" 
+                  : "Hãy chọn các tour du lịch trải nghiệm hoặc nhờ AI tư vấn để bắt đầu lên lịch trình nhé!"}
               </p>
             </div>
           ) : (
@@ -47,10 +54,12 @@ export default function Cart({
                       <Calendar size={12} />
                       {new Date(item.date).toLocaleDateString("vi-VN")}
                     </span>
-                    <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                      <Users size={12} />
-                      {item.adults} NL {item.children > 0 && `, ${item.children} TE`}
-                    </span>
+                    {!item.isCustom && (
+                      <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                        <Users size={12} />
+                        {item.adults} {isEn ? "Adults" : "NL"}{item.children > 0 && `, ${item.children} ${isEn ? "Children" : "TE"}`}
+                      </span>
+                    )}
                   </div>
                   
                   <div className="cart-item-price" style={{ marginTop: "10px" }}>
@@ -61,7 +70,7 @@ export default function Cart({
                 <button
                   className="remove-cart-item"
                   onClick={() => onRemoveItem(idx)}
-                  aria-label="Xóa tour khỏi giỏ"
+                  aria-label={isEn ? "Remove item" : "Xóa tour khỏi giỏ"}
                 >
                   <Trash2 size={16} />
                 </button>
@@ -73,11 +82,11 @@ export default function Cart({
         {cartItems.length > 0 && (
           <div className="cart-footer">
             <div className="cart-summary-row">
-              <span>Tổng số tiền:</span>
+              <span>{t.cart_total}</span>
               <span className="total-price">{formatPrice(total)} đ</span>
             </div>
             <button className="btn btn-accent checkout-btn" onClick={onCheckoutClick}>
-              Xác Nhận Hành Trình & Đặt Chỗ
+              {t.cart_btn_checkout}
             </button>
           </div>
         )}

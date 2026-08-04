@@ -1,42 +1,13 @@
 import React, { useState } from "react";
 import { Plane, Ship, Hotel, Utensils, Compass, Plus, Trash2, ArrowUp, ArrowDown, ShoppingBag, Sparkles, AlertCircle } from "lucide-react";
+import { translations } from "../data/translations";
 
-const SERVICES_BANK = {
-  flight: [
-    { id: "fl-vn", category: "flight", name: "Vé bay khứ hồi Vietnam Airlines", desc: "Hãng bay truyền thống, đã gồm 23kg ký gửi & suất ăn.", price: 1200000, icon: Plane },
-    { id: "fl-vj", category: "flight", name: "Vé bay khứ hồi VietJet Air", desc: "Hãng bay giá rẻ, vé phổ thông, chưa gồm hành lý ký gửi.", price: 900000, icon: Plane },
-    { id: "fl-qh", category: "flight", name: "Vé bay khứ hồi Bamboo Airways", desc: "Hãng hàng không thân thiện, dịch vụ chất lượng cao.", price: 1100000, icon: Plane }
-  ],
-  transport: [
-    { id: "tr-bike", category: "transport", name: "Thuê xe máy tự lái (24h)", desc: "Xe ga/xe số tự chọn, giao xe tại khách sạn/sân bay.", price: 120000, icon: Ship },
-    { id: "tr-car4", category: "transport", name: "Thuê ô tô 4 chỗ kèm tài xế (Ngày)", desc: "Hành trình tự chọn đi các điểm Bắc/Nam Đảo.", price: 800000, icon: Ship },
-    { id: "tr-transit", category: "transport", name: "Thuê xe Ford Transit 16 chỗ (Ngày)", desc: "Phù hợp cho gia đình đông người, hội nhóm.", price: 1200000, icon: Ship },
-    { id: "tr-limo", category: "transport", name: "Thuê xe Limousine VIP 9 chỗ (Ngày)", desc: "Trải nghiệm sang trọng đẳng cấp, tài xế phục vụ chu đáo.", price: 2000000, icon: Ship }
-  ],
-  hotel: [
-    { id: "ht-vin", category: "hotel", name: "Vinpearl Resort & Spa Phú Quốc 5*", desc: "Phòng Deluxe gồm buffet sáng, hồ bơi vô cực lớn.", price: 2200000, icon: Hotel },
-    { id: "ht-novo", category: "hotel", name: "Novotel Phu Quoc Resort 5*", desc: "Nằm ở Bãi Trường, không gian hiện đại, yên tĩnh.", price: 1800000, icon: Hotel },
-    { id: "ht-3star", category: "hotel", name: "Khách sạn Dương Đông 3*", desc: "Gần chợ đêm, thuận tiện đi lại ăn uống vui chơi.", price: 600000, icon: Hotel },
-    { id: "ht-home", category: "hotel", name: "Homestay ven biển Hàm Ninh", desc: "Trải nghiệm mộc mạc đón bình minh làng chài.", price: 350000, icon: Hotel }
-  ],
-  dining: [
-    { id: "dn-rach", category: "dining", name: "Ăn hải sản bè nổi Rạch Vẹm", desc: "Lẩu hải sản chua cay, ghẹ hấp, tôm nướng tươi roi rói.", price: 350000, icon: Utensils },
-    { id: "dn-market", category: "dining", name: "Buffet lẩu nướng Chợ đêm", desc: "Hơn 50 món ăn đường phố hải sản đa dạng.", price: 250000, icon: Utensils },
-    { id: "dn-ganh", category: "dining", name: "Cơm niêu truyền thống Gành Dầu", desc: "Cơm cháy nóng giòn ăn kèm cá biển kho tộ và rau luộc.", price: 150000, icon: Utensils },
-    { id: "dn-fine", category: "dining", name: "Bữa tối Fine Dining ven biển", desc: "Thưởng thức ẩm thực cao cấp dưới ánh nến rì rào sóng vỗ.", price: 800000, icon: Utensils }
-  ],
-  activity: [
-    { id: "ac-5islands", category: "activity", name: "Trải nghiệm Cano 5 Đảo VIP", desc: "Cáp treo Hòn Thơm, lặn san hô, chụp ảnh SUP & Flycam.", price: 1090000, icon: Compass },
-    { id: "ac-starfish", category: "activity", name: "Ngắm sao biển bãi Rạch Vẹm", desc: "Chụp hình cùng sao biển đỏ tự nhiên bên cát trắng mịn.", price: 790000, icon: Compass },
-    { id: "ac-trekking", category: "activity", name: "Trekking xuyên Rừng Quốc Gia", desc: "Khám phá thảm thực vật rừng nguyên sinh Phú Quốc.", price: 890000, icon: Compass },
-    { id: "ac-squid", category: "activity", name: "Ngắm hoàng hôn & Câu mực đêm", desc: "Trải nghiệm làm ngư dân câu mực trên tàu gỗ lớn.", price: 450000, icon: Compass },
-    { id: "ac-safari", category: "activity", name: "Vé VinWonders & Safari Phú Quốc", desc: "Vui chơi thế giới nước, ngắm động vật bán hoang dã.", price: 1350000, icon: Compass }
-  ]
-};
-
-export default function CustomTourBuilder({ onBookCustomItinerary }) {
-  const [activeCategory, setActiveCategory] = useState("flight");
+export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatabase, language }) {
+  const [activeCategory, setActiveCategory] = useState("hotel");
   const [timeline, setTimeline] = useState([]);
+  const [showMediaId, setShowMediaId] = useState(null);
+  const t = translations[language || "vi"];
+  const isEn = language === "en";
 
   // Drag and drop HTML5 setup
   const handleDragStart = (e, item) => {
@@ -56,25 +27,22 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
         addItemToTimeline(item);
       }
     } catch (err) {
-      console.error("Error drop", err);
+      console.error("Drop error", err);
     }
   };
 
-  // Add item
   const addItemToTimeline = (item) => {
-    const uniqueItem = {
+    const newItem = {
       ...item,
-      uniqueId: `${item.id}-${Date.now()}`
+      uniqueId: `${item.id}-${Date.now()}` // Generate unique ID for list ordering
     };
-    setTimeline((prev) => [...prev, uniqueItem]);
+    setTimeline((prev) => [...prev, newItem]);
   };
 
-  // Delete item
   const removeItem = (uniqueId) => {
     setTimeline((prev) => prev.filter((item) => item.uniqueId !== uniqueId));
   };
 
-  // Move item up
   const moveItemUp = (index) => {
     if (index === 0) return;
     setTimeline((prev) => {
@@ -86,10 +54,9 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
     });
   };
 
-  // Move item down
   const moveItemDown = (index) => {
-    if (index === timeline.length - 1) return;
     setTimeline((prev) => {
+      if (index === prev.length - 1) return prev;
       const newList = [...prev];
       const temp = newList[index];
       newList[index] = newList[index + 1];
@@ -98,46 +65,64 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
     });
   };
 
+  // Compute total cost
+  const totalCost = timeline.reduce((acc, item) => acc + item.price, 0);
+
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN").format(price);
   };
 
-  const totalCost = timeline.reduce((acc, item) => acc + item.price, 0);
-
   const handleCheckout = () => {
     if (timeline.length === 0) return;
     
-    // Format custom itinerary to match cart item standard
     const configuredTour = {
       tourId: "custom-tour",
-      tourName: "Hành Trình Tự Thiết Kế Phú Quốc",
+      tourName: isEn ? "Custom Personalized Phu Quoc Itinerary" : "Hành Trình Tự Thiết Kế Phú Quốc",
       price: totalCost,
-      date: new Date().toISOString().split("T")[0], // Default today
+      date: new Date().toISOString().split("T")[0],
       adults: 1,
       children: 0,
       totalPrice: totalCost,
       isCustom: true,
-      customItems: timeline.map(t => ({ name: t.name, price: t.price, category: t.category }))
+      customItems: timeline.map(item => ({
+        name: isEn ? (item.name_en || item.name) : item.name,
+        price: item.price,
+        category: item.category
+      }))
     };
 
     onBookCustomItinerary(configuredTour);
   };
 
   const categoryTabs = [
-    { id: "flight", label: "✈️ Vé Máy Bay" },
-    { id: "transport", label: "🚗 Di Chuyển" },
-    { id: "hotel", label: "🏨 Chỗ Ở" },
-    { id: "dining", label: "🍽️ Ăn Uống" },
-    { id: "activity", label: "🏄 Trải Nghiệm" }
+    { id: "hotel", label: t.tab_hotel },
+    { id: "dining", label: t.tab_dining },
+    { id: "activity", label: t.tab_activity }
   ];
 
+  // Helper to translate timeline categories
+  const getTimelineCategoryLabel = (category) => {
+    switch (category) {
+      case "flight":
+        return isEn ? "Flight" : "Vé máy bay";
+      case "transport":
+        return isEn ? "Transport" : "Vận chuyển";
+      case "hotel":
+        return isEn ? "Stay (Night)" : "Nghỉ ngơi (Đêm)";
+      case "dining":
+        return isEn ? "Dining" : "Ẩm thực";
+      case "activity":
+        return isEn ? "Activity" : "Trải nghiệm";
+      default:
+        return category;
+    }
+  };
+
   return (
-    <section id="transport" className="builder-section">
+    <section id="builder" className="builder-section">
       <div className="container">
-        <h2 className="section-title">Tự Thiết Kế Tour Cá Nhân</h2>
-        <p className="section-subtitle">
-          Kéo thả hoặc nhấn chọn các dịch vụ riêng lẻ dưới đây để tự xây dựng một tour nghỉ dưỡng độc đáo phù hợp nhất với kế hoạch của bạn.
-        </p>
+        <h2 className="section-title">{t.builder_title}</h2>
+        <p className="section-subtitle">{t.builder_subtitle}</p>
 
         <div className="builder-container">
           {/* Left Side: Services Bank */}
@@ -155,12 +140,13 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
             </div>
 
             <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "16px" }}>
-              💡 *Mẹo: Bạn có thể kéo thả các thẻ dịch vụ bên dưới sang khung lịch trình bên phải hoặc nhấn nút (+) để thêm.*
+              {t.builder_tip}
             </p>
 
             <div className="bank-items-grid">
-              {SERVICES_BANK[activeCategory].map((item) => {
-                const IconComponent = item.icon;
+              {servicesDatabase[activeCategory]?.map((item) => {
+                const displayName = isEn ? (item.name_en || item.name) : item.name;
+                const displayDesc = isEn ? (item.desc_en || item.desc) : item.desc;
                 return (
                   <div
                     key={item.id}
@@ -179,11 +165,72 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
                           {activeCategory === "activity" && <Compass size={18} />}
                         </span>
                       </div>
-                      <h4 className="bank-item-name">{item.name}</h4>
-                      <p className="bank-item-desc">{item.desc}</p>
+                      <h4 className="bank-item-name">{displayName}</h4>
+                      <p className="bank-item-desc">{displayDesc}</p>
+
+                      {/* Media indicators & Toggle button */}
+                      {(item.image || item.video || item.youtube) && (
+                        <div style={{ marginTop: "10px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
+                          {item.image && <span style={{ fontSize: "0.65rem", background: "rgba(16,185,129,0.08)", color: "#10b981", padding: "2px 4px", borderRadius: "3px", fontWeight: 600 }}>🖼️ Ảnh</span>}
+                          {item.video && <span style={{ fontSize: "0.65rem", background: "rgba(59,130,246,0.08)", color: "#3b82f6", padding: "2px 4px", borderRadius: "3px", fontWeight: 600 }}>🎥 Video</span>}
+                          {item.youtube && <span style={{ fontSize: "0.65rem", background: "rgba(239,68,68,0.08)", color: "#ef4444", padding: "2px 4px", borderRadius: "3px", fontWeight: 600 }}>▶️ YT</span>}
+                          
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowMediaId(showMediaId === item.id ? null : item.id);
+                            }}
+                            style={{
+                              marginLeft: "auto",
+                              background: "none",
+                              border: "none",
+                              color: "var(--secondary)",
+                              fontSize: "0.72rem",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              padding: "2px 0"
+                            }}
+                          >
+                            {showMediaId === item.id ? (isEn ? "Hide" : "Ẩn media") : (isEn ? "Media" : "Xem media")}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Collapsible Media Player */}
+                      {showMediaId === item.id && (
+                        <div style={{ marginTop: "12px", borderTop: "1px dashed rgba(0,0,0,0.08)", paddingTop: "10px" }}>
+                          {item.image && (
+                            <div style={{ borderRadius: "8px", overflow: "hidden", marginBottom: "8px", maxHeight: "110px" }}>
+                              <img src={item.image} alt={displayName} style={{ width: "100%", height: "100px", objectFit: "cover" }} />
+                            </div>
+                          )}
+                          {item.video && (
+                            <div style={{ borderRadius: "8px", overflow: "hidden", marginBottom: "8px" }}>
+                              <video src={item.video} controls style={{ width: "100%", maxHeight: "100px", background: "#000" }} />
+                            </div>
+                          )}
+                          {item.youtube && (
+                            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: "8px", marginBottom: "8px" }}>
+                              <iframe
+                                src={item.youtube.includes("watch?v=") 
+                                  ? item.youtube.replace("watch?v=", "embed/").split("&")[0] 
+                                  : item.youtube.includes("youtu.be/") 
+                                    ? item.youtube.replace("youtu.be/", "youtube.com/embed/") 
+                                    : item.youtube}
+                                title="YouTube player"
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <div className="bank-item-footer">
+                    <div className="bank-item-footer" style={{ borderTop: "1px solid rgba(0,0,0,0.04)", paddingTop: "10px", marginTop: "10px" }}>
                       <span className="bank-item-price">{formatPrice(item.price)} đ</span>
                       <button
                         type="button"
@@ -200,6 +247,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
                           justifyContent: "center",
                           cursor: "pointer"
                         }}
+                        title={t.btn_add_timeline}
                       >
                         <Plus size={16} />
                       </button>
@@ -219,19 +267,21 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
             <div className="timeline-header">
               <h3 style={{ fontSize: "1.15rem", display: "flex", alignItems: "center", gap: "8px" }}>
                 <Sparkles size={18} style={{ color: "var(--accent)" }} />
-                Dòng Thời Gian Lịch Trình
+                {t.builder_timeline_title}
               </h3>
               <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                {timeline.length} dịch vụ đã chọn
+                {timeline.length} {isEn ? "selected items" : "dịch vụ đã chọn"}
               </span>
             </div>
 
             {timeline.length === 0 ? (
               <div className="builder-empty-state">
                 <AlertCircle size={44} style={{ color: "var(--text-muted)", opacity: 0.5 }} />
-                <p style={{ fontSize: "0.9rem" }}>Lịch trình trống.</p>
+                <p style={{ fontSize: "0.9rem" }}>{isEn ? "Timeline is empty." : "Lịch trình trống."}</p>
                 <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
-                  Hãy kéo thả các dịch vụ từ cột bên trái hoặc nhấn nút (+) để bắt đầu thiết kế lịch trình của riêng bạn.
+                  {isEn 
+                    ? "Drag and drop services from the left pane or click (+) to start." 
+                    : "Hãy kéo thả các dịch vụ từ cột bên trái hoặc nhấn nút (+) để bắt đầu thiết kế."}
                 </p>
               </div>
             ) : (
@@ -240,13 +290,9 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
                   <div key={item.uniqueId} className="timeline-item">
                     <div className="timeline-item-info">
                       <span className="timeline-item-category">
-                        {item.category === "flight" && "Vé máy bay"}
-                        {item.category === "transport" && "Vận chuyển"}
-                        {item.category === "hotel" && "Nghỉ ngơi (Đêm)"}
-                        {item.category === "dining" && "Ẩm thực"}
-                        {item.category === "activity" && "Trải nghiệm"}
+                        {getTimelineCategoryLabel(item.category)}
                       </span>
-                      <h4 className="timeline-item-title">{item.name}</h4>
+                      <h4 className="timeline-item-title">{isEn ? (item.name_en || item.name) : item.name}</h4>
                       <span className="timeline-item-price">{formatPrice(item.price)} đ</span>
                     </div>
 
@@ -285,14 +331,14 @@ export default function CustomTourBuilder({ onBookCustomItinerary }) {
             {timeline.length > 0 && (
               <div className="builder-footer">
                 <div>
-                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>Tạm tính tổng cộng</span>
+                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>{t.builder_total_cost}</span>
                   <strong style={{ fontSize: "1.4rem", color: "var(--secondary)", fontWeight: 800 }}>
                     {formatPrice(totalCost)} đ
                   </strong>
                 </div>
                 <button className="btn btn-accent" onClick={handleCheckout} style={{ display: "flex", gap: "6px" }}>
                   <ShoppingBag size={18} />
-                  Đặt Hành Trình Tự Chọn
+                  {t.builder_btn_book}
                 </button>
               </div>
             )}

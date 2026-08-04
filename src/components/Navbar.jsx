@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Compass, ShoppingCart, Menu, X } from "lucide-react";
+import { Compass, ShoppingCart, Menu, X, Shield } from "lucide-react";
+import { translations } from "../data/translations";
 
-export default function Navbar({ cartCount, onCartClick, activeSection, setActiveSection }) {
+export default function Navbar({ cartCount, onCartClick, activeSection, setActiveSection, userSession, onLoginClick, onLogout, language, onLanguageToggle }) {
+  const t = translations[language || "vi"];
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -19,11 +21,10 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
   }, []);
 
   const navItems = [
-    { id: "hero", label: "Trang Chủ" },
-    { id: "tours", label: "Tour Du Lịch" },
-    { id: "builder", label: "Tự Thiết Kế Tour" },
-    { id: "transport", label: "Vé Máy Bay & Phà" },
-    { id: "ai-planner", label: "Trợ Lý AI" }
+    { id: "hero", label: t.nav_home },
+    { id: "tours", label: t.nav_tours },
+    { id: "builder", label: t.nav_builder },
+    { id: "ai-planner", label: t.nav_ai }
   ];
 
   const handleNavClick = (id) => {
@@ -68,6 +69,15 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
 
         {/* Desktop Actions */}
         <div className="nav-actions">
+          {/* Language Toggle Button */}
+          <button 
+            className="btn btn-outline"
+            onClick={onLanguageToggle}
+            style={{ padding: "6px 12px", fontSize: "0.8rem", fontWeight: "bold", border: "1px solid rgba(13, 44, 84, 0.15)", background: "#f8fafc", color: "var(--primary)", display: "flex", alignItems: "center", gap: "4px" }}
+          >
+            🌐 {language === "vi" ? "EN" : "VI"}
+          </button>
+
           <button 
             className="cart-icon-btn" 
             onClick={onCartClick}
@@ -77,13 +87,30 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
             <ShoppingCart size={20} />
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
           </button>
-          <button 
-            className="btn btn-primary"
-            onClick={() => handleNavClick("ai-planner")}
-            style={{ padding: "8px 20px", fontSize: "0.9rem" }}
-          >
-            Tư vấn AI
-          </button>
+          
+          {userSession.role === "guest" ? (
+            <button 
+              className="btn btn-outline"
+              onClick={onLoginClick}
+              style={{ padding: "8px 16px", fontSize: "0.85rem", display: "flex", alignItems: "center", gap: "4px" }}
+            >
+              <Shield size={16} />
+              {t.nav_login}
+            </button>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              <span style={{ fontSize: "0.8rem", background: "rgba(0,168,150,0.08)", padding: "6px 12px", borderRadius: "20px", color: "var(--secondary)", fontWeight: 700 }}>
+                {userSession.role === "admin" ? "🔑 Admin" : `👤 HDV: ${userSession.details.name.split(" ").pop()}`}
+              </span>
+              <button 
+                className="btn btn-primary"
+                onClick={onLogout}
+                style={{ padding: "8px 14px", fontSize: "0.8rem" }}
+              >
+                {t.nav_logout}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>

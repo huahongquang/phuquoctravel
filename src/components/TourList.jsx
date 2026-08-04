@@ -1,48 +1,52 @@
 import React, { useState } from "react";
 import TourCard from "./TourCard";
 import { toursData } from "../data/toursData";
+import { translations } from "../data/translations";
 
-export default function TourList({ onBookClick }) {
+export default function TourList({ onBookClick, onDetailClick, tours, language }) {
   const [activeFilter, setActiveFilter] = useState("all");
+  const t = translations[language || "vi"];
 
   const filterItems = [
-    { id: "all", label: "Tất cả các tour" },
-    { id: "adventure", label: "Cano & Cáp treo" },
-    { id: "nature", label: "Thiên nhiên & Rạch Vẹm" },
-    { id: "culture", label: "Lịch sử & Điểm đến" },
-    { id: "leisure", label: "Hoàng hôn & Câu mực" }
+    { id: "all", label: t.filter_all },
+    { id: "adventure", label: t.filter_adv },
+    { id: "nature", label: t.filter_nat },
+    { id: "culture", label: t.filter_cul },
+    { id: "leisure", label: t.filter_lei }
   ];
 
   const filteredTours = activeFilter === "all"
-    ? toursData
-    : toursData.filter(tour => tour.category === activeFilter);
+    ? (tours || toursData)
+    : (tours || toursData).filter(tour => tour.category === activeFilter);
 
   return (
     <section id="tours" className="tours-section">
       <div className="container">
-        <h2 className="section-title">Tour Trải Nghiệm Phú Quốc</h2>
-        <p className="section-subtitle">
-          Danh sách các tour được thiết kế chuyên nghiệp, trọn gói, giúp bạn tận hưởng trọn vẹn từng khoảnh khắc tại Đảo Ngọc.
-        </p>
+        <h2 className="section-title">{t.tours_title}</h2>
+        <p className="section-subtitle">{t.tours_subtitle}</p>
 
-        <div className="filter-bar">
-          {filterItems.map((item) => (
+        {/* Filter Tabs */}
+        <div className="filter-tabs">
+          {filterItems.map((tab) => (
             <button
-              key={item.id}
-              className={`filter-btn ${activeFilter === item.id ? "active" : ""}`}
-              onClick={() => setActiveFilter(item.id)}
+              key={tab.id}
+              className={`filter-btn ${activeFilter === tab.id ? "active" : ""}`}
+              onClick={() => setActiveFilter(tab.id)}
             >
-              {item.label}
+              {tab.label}
             </button>
           ))}
         </div>
 
+        {/* Tours Grid */}
         <div className="tours-grid">
           {filteredTours.map((tour) => (
             <TourCard 
               key={tour.id} 
               tour={tour} 
               onBookClick={onBookClick} 
+              onDetailClick={onDetailClick} 
+              language={language} 
             />
           ))}
         </div>

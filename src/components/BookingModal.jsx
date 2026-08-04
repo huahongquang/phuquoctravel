@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X, Calendar, User, Phone, Mail, Ticket, CheckCircle2, ShoppingBag } from "lucide-react";
+import { translations } from "../data/translations";
 
 export default function BookingModal({
   isOpen,
@@ -10,7 +11,11 @@ export default function BookingModal({
   onAddToCart,
   onCheckoutSubmit,
   bookingDetails, // Details of completed booking for receipt
+  language
 }) {
+  const t = translations[language || "vi"];
+  const isEn = language === "en";
+
   // Add to cart form state
   const [date, setDate] = useState("");
   const [adults, setAdults] = useState(2);
@@ -40,255 +45,234 @@ export default function BookingModal({
   // Calculation for checkout view
   const cartTotal = cartItems ? cartItems.reduce((acc, item) => acc + item.totalPrice, 0) : 0;
 
-  const handleAddToCartSubmit = (e) => {
+  const handleAddSubmit = (e) => {
     e.preventDefault();
-    if (!date) return;
-    onAddToCart({
+    if (!tour) return;
+    
+    const cartItem = {
       tourId: tour.id,
-      tourName: tour.name,
+      tourName: isEn ? (tour.name_en || tour.name) : tour.name,
       price: tour.price,
-      date: date,
-      adults: adults,
-      children: children,
-      totalPrice: tourTotal
-    });
+      date,
+      adults,
+      children,
+      totalPrice: tourTotal,
+      isCustom: false
+    };
+
+    onAddToCart(cartItem);
+    onClose();
   };
 
   const handleCheckoutFormSubmit = (e) => {
     e.preventDefault();
     if (!fullName || !phone || !email) return;
+
+    const bookingId = "PQT-" + Math.floor(100000 + Math.random() * 900000);
+    const bookingDate = new Date().toLocaleDateString("vi-VN");
+
     onCheckoutSubmit({
+      bookingId,
+      bookingDate,
       fullName,
       phone,
-      email,
-      bookingId: "PQ-" + Math.floor(100000 + Math.random() * 900000),
-      bookingDate: new Date().toLocaleDateString("vi-VN") + " " + new Date().toLocaleTimeString("vi-VN")
+      email
     });
   };
 
   return (
     <div className={`modal-overlay ${isOpen ? "open" : ""}`} onClick={onClose}>
       <div className="booking-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h3>
-            {view === "add-to-cart" && "Lên Kế Hoạch Trải Nghiệm"}
-            {view === "checkout" && "Thông Tin Đặt Tour"}
-            {view === "receipt" && "Biên Lai Đặt Tour"}
-          </h3>
-          <button className="close-modal-btn" onClick={onClose}>
-            <X size={20} />
-          </button>
-        </div>
+        {/* Modal Close Button */}
+        <button className="close-modal-btn" onClick={onClose} aria-label="Close modal">
+          <X size={20} />
+        </button>
 
-        <div className="modal-body">
-          {/* VIEW 1: ADD TO CART */}
-          {view === "add-to-cart" && tour && (
-            <form onSubmit={handleAddToCartSubmit}>
-              <div className="booking-summary-card">
-                <h4>{tour.name}</h4>
-                <p>Thời lượng: {tour.duration}</p>
-                <p style={{ marginTop: "4px", fontWeight: 700, color: "var(--secondary)" }}>
-                  {formatPrice(tour.price)} VNĐ / người lớn • {formatPrice(tour.price * 0.7)} VNĐ / trẻ em (70%)
-                </p>
+        {/* 1. VIEW ADD TO CART */}
+        {view === "add-to-cart" && tour && (
+          <div>
+            <div className="modal-header">
+              <Ticket size={24} style={{ color: "var(--secondary)" }} />
+              <div>
+                <h3 style={{ margin: 0, color: "var(--primary)", fontSize: "1.15rem", fontWeight: 700 }}>
+                  {t.modal_title_add}
+                </h3>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                  {isEn ? (tour.name_en || tour.name) : tour.name}
+                </span>
               </div>
+            </div>
 
-              <div className="form-grid" style={{ marginBottom: "24px" }}>
-                <div className="form-group form-group-full">
-                  <label htmlFor="travel-date">Ngày khởi hành</label>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      type="date"
-                      id="travel-date"
-                      required
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      min={new Date().toISOString().split("T")[0]}
-                      style={{ width: "100%" }}
-                    />
+            <div className="modal-body">
+              <form onSubmit={handleAddSubmit}>
+                <div className="form-group">
+                  <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <Calendar size={16} />
+                    {t.form_date_start}
+                  </label>
+                  <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "16px" }}>
+                  <div className="form-group">
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <User size={16} />
+                      {t.form_qty_adult}
+                    </label>
+                    <input type="number" min="1" max="50" value={adults} onChange={(e) => setAdults(parseInt(e.target.value) || 1)} />
+                  </div>
+                  <div className="form-group">
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                      <User size={16} />
+                      {t.form_qty_child}
+                    </label>
+                    <input type="number" min="0" max="50" value={children} onChange={(e) => setChildren(parseInt(e.target.value) || 0)} />
+                  </div>
+                </div>
+
+                {/* Live total display */}
+                <div style={{ borderTop: "1px solid rgba(13,44,84,0.08)", marginTop: "24px", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>{t.cart_total}</span>
+                    <strong style={{ fontSize: "1.4rem", color: "var(--secondary)", fontWeight: 800 }}>
+                      {formatPrice(tourTotal)} VNĐ
+                    </strong>
+                  </div>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "12px 24px", borderRadius: "10px", fontWeight: "bold" }}>
+                    {t.btn_add_to_cart}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 2. VIEW CHECKOUT FORM */}
+        {view === "checkout" && (
+          <div>
+            <div className="modal-header">
+              <ShoppingBag size={24} style={{ color: "var(--secondary)" }} />
+              <div>
+                <h3 style={{ margin: 0, color: "var(--primary)", fontSize: "1.15rem", fontWeight: 700 }}>
+                  {t.modal_title_checkout}
+                </h3>
+                <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                  {cartItems.length} {isEn ? "items in cart" : "dịch vụ trong giỏ hàng"}
+                </span>
+              </div>
+            </div>
+
+            <div className="modal-body">
+              <form onSubmit={handleCheckoutFormSubmit}>
+                {/* Cart summary list */}
+                <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.02)", marginBottom: "20px" }}>
+                  <strong style={{ color: "var(--primary)", fontSize: "0.8rem", display: "block", marginBottom: "8px", textTransform: "uppercase" }}>
+                    {isEn ? "Selected Itineraries Summary" : "Tóm tắt hành trình đã chọn"}
+                  </strong>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    {cartItems.map((item, idx) => (
+                      <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem" }}>
+                        <span style={{ color: "var(--text)", maxWidth: "70%" }}>• {item.tourName}</span>
+                        <span style={{ fontWeight: 600, color: "var(--secondary)" }}>{formatPrice(item.totalPrice)} đ</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label>Người lớn (Từ 10 tuổi)</label>
-                  <div className="guest-counter-wrapper">
-                    <span>{formatPrice(tour.price)} đ</span>
-                    <div className="counter-controls">
-                      <button
-                        type="button"
-                        className="counter-btn"
-                        onClick={() => setAdults(prev => Math.max(1, prev - 1))}
-                        disabled={adults <= 1}
-                      >
-                        -
-                      </button>
-                      <span className="counter-value">{adults}</span>
-                      <button
-                        type="button"
-                        className="counter-btn"
-                        onClick={() => setAdults(prev => prev + 1)}
-                      >
-                        +
-                      </button>
-                    </div>
+                  <label>{t.form_fullname}</label>
+                  <input type="text" required placeholder={isEn ? "Your full name" : "Nhập họ và tên của bạn"} value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "12px" }}>
+                  <div className="form-group">
+                    <label>{t.form_phone}</label>
+                    <input type="tel" required placeholder="090..." value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>{t.form_email}</label>
+                    <input type="email" required placeholder="example@mail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label>Trẻ em (4 - 9 tuổi)</label>
-                  <div className="guest-counter-wrapper">
-                    <span>{formatPrice(tour.price * 0.7)} đ</span>
-                    <div className="counter-controls">
-                      <button
-                        type="button"
-                        className="counter-btn"
-                        onClick={() => setChildren(prev => Math.max(0, prev - 1))}
-                        disabled={children <= 0}
-                      >
-                        -
-                      </button>
-                      <span className="counter-value">{children}</span>
-                      <button
-                        type="button"
-                        className="counter-btn"
-                        onClick={() => setChildren(prev => prev + 1)}
-                      >
-                        +
-                      </button>
-                    </div>
+                <div style={{ borderTop: "1px solid rgba(13,44,84,0.08)", marginTop: "24px", paddingTop: "20px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>{t.cart_total}</span>
+                    <strong style={{ fontSize: "1.4rem", color: "var(--secondary)", fontWeight: 800 }}>
+                      {formatPrice(cartTotal)} VNĐ
+                    </strong>
                   </div>
+                  <button type="submit" className="btn btn-primary" style={{ padding: "12px 24px", borderRadius: "10px", fontWeight: "bold" }}>
+                    {t.btn_confirm_booking}
+                  </button>
                 </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 3. VIEW TICKET RECEIPT */}
+        {view === "receipt" && bookingDetails && (
+          <div>
+            <div className="modal-header" style={{ background: "var(--primary)", borderBottom: "none" }}>
+              <CheckCircle2 size={24} style={{ color: "#10b981" }} />
+              <div>
+                <h3 style={{ margin: 0, color: "var(--white)", fontSize: "1.15rem", fontWeight: 700 }}>
+                  {t.modal_title_receipt}
+                </h3>
+                <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>
+                  {isEn ? "E-Ticket confirmation pass" : "Biên lai mã vé điện tử"}
+                </span>
               </div>
+            </div>
 
-              <div className="modal-footer" style={{ padding: "16px 0 0 0", borderTop: "1px solid rgba(13, 44, 84, 0.08)" }}>
-                <div className="booking-total-box">
-                  <span className="total-label">Tổng tiền tạm tính</span>
-                  <div className="booking-total-box .total-val" style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--secondary)" }}>
-                    {formatPrice(tourTotal)} đ
-                  </div>
-                </div>
-                <button type="submit" className="btn btn-accent">
-                  <ShoppingBag size={18} />
-                  Thêm Vào Hành Trình
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* VIEW 2: CHECKOUT */}
-          {view === "checkout" && (
-            <form onSubmit={handleCheckoutFormSubmit}>
-              <div className="booking-summary-card" style={{ maxHeight: "150px", overflowY: "auto" }}>
-                <h4 style={{ marginBottom: "8px" }}>Tóm tắt hành trình ({cartItems.length} tour)</h4>
-                {cartItems.map((item, idx) => (
-                  <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", marginBottom: "4px", color: "var(--text-muted)" }}>
-                    <span>{item.tourName} ({item.adults} NL, {item.children} TE)</span>
-                    <span>{formatPrice(item.totalPrice)} đ</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="form-grid">
-                <div className="form-group form-group-full">
-                  <label htmlFor="fullname">Họ và tên khách hàng</label>
-                  <input
-                    type="text"
-                    id="fullname"
-                    required
-                    placeholder="Nguyễn Văn A"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="phone">Số điện thoại</label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    required
-                    placeholder="0901234567"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="email">Email liên hệ</label>
-                  <input
-                    type="email"
-                    id="email"
-                    required
-                    placeholder="example@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="modal-footer" style={{ padding: "16px 0 0 0", borderTop: "1px solid rgba(13, 44, 84, 0.08)" }}>
-                <div className="booking-total-box">
-                  <span className="total-label">Tổng thanh toán</span>
-                  <div className="booking-total-box .total-val" style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--secondary)" }}>
-                    {formatPrice(cartTotal)} đ
-                  </div>
-                </div>
-                <button type="submit" className="btn btn-accent">
-                  Xác Nhận Đặt Tour
-                </button>
-              </div>
-            </form>
-          )}
-
-          {/* VIEW 3: VIRTUAL TICKET RECEIPT */}
-          {view === "receipt" && bookingDetails && (
-            <div className="receipt-wrapper">
-              <div className="receipt-badge-success">
-                <CheckCircle2 size={20} />
-                <span>Đặt Chỗ Thành Công!</span>
-              </div>
-              <h4 className="receipt-title">Vé Trải Nghiệm Phú Quốc</h4>
-              <p className="receipt-subtitle">Vui lòng xuất trình vé này tại điểm đón khách</p>
+            <div className="modal-body" style={{ padding: "30px 40px", background: "var(--white)", borderRadius: "0 0 24px 24px" }}>
+              <p className="receipt-subtitle" style={{ fontSize: "0.82rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "20px", fontWeight: 500 }}>
+                {t.receipt_subtitle}
+              </p>
 
               <div className="receipt-info-grid">
                 <div className="receipt-field">
-                  <span className="field-label">Mã Đặt Chỗ</span>
-                  <span className="field-val" style={{ color: "var(--secondary)" }}>{bookingDetails.bookingId}</span>
+                  <span className="field-label">{t.receipt_code}</span>
+                  <span className="field-val" style={{ color: "var(--secondary)", fontWeight: 700 }}>{bookingDetails.bookingId}</span>
                 </div>
                 <div className="receipt-field">
-                  <span className="field-label">Ngày Đặt</span>
+                  <span className="field-label">{t.receipt_date}</span>
                   <span className="field-val">{bookingDetails.bookingDate}</span>
                 </div>
                 <div className="receipt-field">
-                  <span className="field-label">Khách Hàng</span>
+                  <span className="field-label">{t.receipt_customer}</span>
                   <span className="field-val">{bookingDetails.fullName}</span>
                 </div>
                 <div className="receipt-field">
-                  <span className="field-label">Số Điện Thoại</span>
+                  <span className="field-label">{t.receipt_phone}</span>
                   <span className="field-val">{bookingDetails.phone}</span>
                 </div>
                 <div className="receipt-field" style={{ gridColumn: "1 / -1" }}>
-                  <span className="field-label">Email Liên Hệ</span>
+                  <span className="field-label">{t.receipt_email}</span>
                   <span className="field-val">{bookingDetails.email}</span>
                 </div>
               </div>
 
-              <div className="receipt-tours-list">
-                <span className="field-label" style={{ marginBottom: "8px" }}>Chi tiết dịch vụ</span>
+              <div className="receipt-tours-list" style={{ marginTop: "24px" }}>
+                <span className="field-label" style={{ marginBottom: "8px", textTransform: "uppercase", fontSize: "0.78rem" }}>
+                  {t.receipt_details}
+                </span>
                 {bookingDetails.items.map((item, idx) => (
                   <div key={idx} className="receipt-tour-row" style={{ flexDirection: "column", borderBottom: item.isCustom ? "1px dashed rgba(13, 44, 84, 0.1)" : "none", paddingBottom: item.isCustom ? "12px" : "0", marginBottom: "12px" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                       <div>
                         <span className="tour-name" style={{ fontWeight: 600, color: "var(--primary)" }}>{item.tourName}</span>
-                        {!item.isCustom && <span className="tour-qty" style={{ color: "var(--text-muted)", marginLeft: "6px" }}>({item.adults} NL, {item.children} TE)</span>}
+                        {!item.isCustom && <span className="tour-qty" style={{ color: "var(--text-muted)", marginLeft: "6px" }}>({item.adults} {isEn ? "Ad" : "NL"}, {item.children} {isEn ? "Ch" : "TE"})</span>}
                         <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
-                          {item.isCustom ? "Hành trình cá nhân hóa tự chọn" : `Khởi hành: ${new Date(item.date).toLocaleDateString("vi-VN")}`}
+                          {item.isCustom ? (isEn ? "Personalized custom itinerary" : "Hành trình cá nhân hóa tự chọn") : `${isEn ? "Departure" : "Khởi hành"}: ${new Date(item.date).toLocaleDateString("vi-VN")}`}
                         </div>
                       </div>
                       <span className="tour-price" style={{ fontWeight: 600 }}>{formatPrice(item.totalPrice)} đ</span>
                     </div>
                     {item.isCustom && item.customItems && (
                       <div style={{ background: "#f8fafc", padding: "10px 14px", borderRadius: "10px", marginTop: "8px", width: "100%", fontSize: "0.75rem", border: "1px solid rgba(13, 44, 84, 0.04)" }}>
-                        <strong style={{ color: "var(--primary)", display: "block", marginBottom: "6px" }}>Lịch trình chi tiết:</strong>
+                        <strong style={{ color: "var(--primary)", display: "block", marginBottom: "6px" }}>{isEn ? "Custom details:" : "Lịch trình chi tiết:"}</strong>
                         <ul style={{ paddingLeft: "12px", listStyleType: "circle", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }}>
                           {item.customItems.map((cItem, cIdx) => (
                             <li key={cIdx} style={{ display: "flex", justifyContent: "space-between" }}>
@@ -303,18 +287,18 @@ export default function BookingModal({
                 ))}
               </div>
 
-              <div className="receipt-total-row">
-                <span>Tổng cộng đã thanh toán</span>
-                <span className="total-amount">{formatPrice(bookingDetails.totalAmount)} VNĐ</span>
+              <div className="receipt-total-row" style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid var(--primary)", paddingTop: "16px", marginTop: "20px" }}>
+                <span style={{ fontWeight: 600, color: "var(--primary)" }}>{isEn ? "Total Amount Paid" : "Tổng cộng đã thanh toán"}</span>
+                <span className="total-amount" style={{ fontSize: "1.3rem", color: "var(--secondary)", fontWeight: 800 }}>{formatPrice(bookingDetails.totalAmount)} VNĐ</span>
               </div>
 
-              <div className="receipt-barcode">
-                <div className="barcode-lines" />
-                <span className="barcode-text">{bookingDetails.bookingId}</span>
+              <div className="receipt-barcode" style={{ marginTop: "24px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <div className="barcode-lines" style={{ width: "100%", height: "40px", background: "repeating-linear-gradient(90deg, #000, #000 2px, #fff 2px, #fff 8px)" }} />
+                <span className="barcode-text" style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "6px" }}>{bookingDetails.bookingId} - {t.receipt_barcode_text}</span>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

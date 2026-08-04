@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { Plane, Ship, Calendar, User, MapPin, Search, ArrowRightLeft, ShieldCheck, Ticket } from "lucide-react";
+import { translations } from "../data/translations";
 
-export default function TransportBooking() {
+export default function TransportBooking({ language }) {
   const [activeTab, setActiveTab] = useState("flight"); // 'flight' | 'ferry'
   const [isBooked, setIsBooked] = useState(false);
   const [ticketData, setTicketData] = useState(null);
+  const t = translations[language || "vi"];
+  const isEn = language === "en";
 
   // Flight form state
   const [flightTripType, setFlightTripType] = useState("roundtrip");
@@ -18,7 +21,7 @@ export default function TransportBooking() {
   // Ferry form state
   const [ferryRoute, setFerryRoute] = useState("Rạch Giá - Phú Quốc");
   const [ferryDate, setFerryDate] = useState("");
-  const [ferryBrand, setFerryBrand] = useState("Phú Quốc Express (5 sao)");
+  const [ferryBrand, setFerryBrand] = useState("Phú Quốc Express");
   const [vehicleType, setVehicleType] = useState("Hành khách (không kèm xe)");
   const [ferryGuests, setFerryGuests] = useState(1);
 
@@ -27,12 +30,16 @@ export default function TransportBooking() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("vi-VN").format(price);
+  };
+
   const handleFlightSubmit = (e) => {
     e.preventDefault();
     if (!flightDate || !name || !phone || !email) return;
 
     const ticketNo = "PQC-FL" + Math.floor(1000 + Math.random() * 9000);
-    const flightNo = (airline === "Vietnam Airlines" ? "VN" : airline === "VietJet Air" ? "VJ" : "QH") + Math.floor(100 + Math.random() * 900);
+    const flightNo = (airline.includes("Vietnam") ? "VN" : airline.includes("VietJet") ? "VJ" : "QH") + Math.floor(100 + Math.random() * 900);
     const seatNo = String.fromCharCode(65 + Math.floor(Math.random() * 6)) + Math.floor(1 + Math.random() * 30);
     
     setTicketData({
@@ -59,39 +66,35 @@ export default function TransportBooking() {
     e.preventDefault();
     if (!ferryDate || !name || !phone || !email) return;
 
-    const ticketNo = "PQC-FR" + Math.floor(1000 + Math.random() * 9000);
-    const ferryNo = (ferryBrand.includes("Express") ? "PQE-" : "SD-") + Math.floor(10 + Math.random() * 90);
-    const seatNo = "S" + Math.floor(10 + Math.random() * 90);
-
-    let basePrice = 340000;
-    if (vehicleType.includes("Xe máy")) basePrice += 150000;
-    if (vehicleType.includes("Ô tô")) basePrice += 1000000;
-
+    const ticketNo = "PQC-FE" + Math.floor(1000 + Math.random() * 9000);
+    const seatNo = "DECK-" + Math.floor(10 + Math.random() * 80);
+    
     setTicketData({
       type: "ferry",
       ticketNo,
-      ferryNo,
+      flightNo: ferryBrand,
       seatNo,
       name,
       phone,
       email,
-      route: ferryRoute,
+      from: ferryRoute.split(" - ")[0],
+      to: "Phú Quốc",
       date: ferryDate,
-      brand: ferryBrand,
-      vehicleType,
+      returnDate: null,
+      airline: ferryBrand,
+      ticketClass: vehicleType,
       guests: ferryGuests,
-      price: (ferryGuests * 340000) + (vehicleType !== "Hành khách (không kèm xe)" ? basePrice - 340000 : 0)
+      price: ferryGuests * 350000
     });
     setIsBooked(true);
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat("vi-VN").format(price);
-  };
-
-  const resetForm = () => {
+  const handleReset = () => {
     setIsBooked(false);
     setTicketData(null);
+    setFlightDate("");
+    setFlightReturnDate("");
+    setFerryDate("");
     setName("");
     setPhone("");
     setEmail("");
@@ -100,10 +103,8 @@ export default function TransportBooking() {
   return (
     <section id="transport" className="tours-section" style={{ background: "linear-gradient(180deg, rgba(0, 168, 150, 0.02) 0%, var(--background) 100%)", borderTop: "1px solid rgba(13, 44, 84, 0.03)" }}>
       <div className="container">
-        <h2 className="section-title">Đặt Vé Máy Bay & Tàu Phà</h2>
-        <p className="section-subtitle">
-          Tìm kiếm hành trình, đặt vé máy bay khứ hồi hoặc tàu cao tốc vượt biển kết nối đất liền đến Đảo Ngọc Phú Quốc dễ dàng.
-        </p>
+        <h2 className="section-title">{t.trans_title}</h2>
+        <p className="section-subtitle">{t.trans_subtitle}</p>
 
         {!isBooked ? (
           <div className="glass-panel" style={{ borderRadius: "24px", overflow: "hidden", maxWidth: "900px", margin: "0 auto", padding: "30px" }}>
@@ -115,7 +116,7 @@ export default function TransportBooking() {
                 style={{ borderRadius: "12px", padding: "10px 24px" }}
               >
                 <Plane size={18} />
-                Vé Máy Bay Đến Phú Quốc
+                {isEn ? "Book Flights" : "Vé Máy Bay Đến Phú Quốc"}
               </button>
               <button
                 className={`btn ${activeTab === "ferry" ? "btn-primary" : "btn-outline"}`}
@@ -123,7 +124,7 @@ export default function TransportBooking() {
                 style={{ borderRadius: "12px", padding: "10px 24px" }}
               >
                 <Ship size={18} />
-                Tàu Phà Cao Tốc
+                {isEn ? "Book Ferries" : "Tàu Phà Cao Tốc"}
               </button>
             </div>
 
@@ -138,7 +139,7 @@ export default function TransportBooking() {
                       checked={flightTripType === "roundtrip"}
                       onChange={() => setFlightTripType("roundtrip")}
                     />
-                    Khứ hồi
+                    {isEn ? "Round Trip" : "Khứ hồi"}
                   </label>
                   <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.9rem", fontWeight: 600, cursor: "pointer" }}>
                     <input
@@ -147,306 +148,230 @@ export default function TransportBooking() {
                       checked={flightTripType === "oneway"}
                       onChange={() => setFlightTripType("oneway")}
                     />
-                    Một chiều
+                    {isEn ? "One Way" : "Một chiều"}
                   </label>
                 </div>
 
-                <div className="form-grid" style={{ marginBottom: "24px" }}>
+                <div className="form-grid" style={{ marginBottom: "20px" }}>
                   <div className="form-group">
-                    <label>Điểm khởi hành</label>
+                    <label>{t.form_from}</label>
                     <select value={flightFrom} onChange={(e) => setFlightFrom(e.target.value)}>
                       <option value="TP. Hồ Chí Minh (SGN)">TP. Hồ Chí Minh (SGN)</option>
                       <option value="Hà Nội (HAN)">Hà Nội (HAN)</option>
                       <option value="Đà Nẵng (DAD)">Đà Nẵng (DAD)</option>
                       <option value="Cần Thơ (VCA)">Cần Thơ (VCA)</option>
-                      <option value="Hải Phòng (HPH)">Hải Phòng (HPH)</option>
                     </select>
                   </div>
-
                   <div className="form-group">
-                    <label>Điểm đến (Mặc định)</label>
-                    <input type="text" value="Phú Quốc (PQC)" disabled style={{ background: "#f0f4f8", fontWeight: 600 }} />
+                    <label>{t.form_to}</label>
+                    <input type="text" readOnly value="Phú Quốc (PQC)" style={{ background: "#f1f5f9" }} />
                   </div>
-
                   <div className="form-group">
-                    <label>Ngày đi</label>
-                    <input
-                      type="date"
-                      required
-                      value={flightDate}
-                      min={new Date().toISOString().split("T")[0]}
-                      onChange={(e) => setFlightDate(e.target.value)}
-                    />
+                    <label>{t.form_date_dep}</label>
+                    <input type="date" required value={flightDate} onChange={(e) => setFlightDate(e.target.value)} />
                   </div>
+                  {flightTripType === "roundtrip" && (
+                    <div className="form-group">
+                      <label>{t.form_date_ret}</label>
+                      <input type="date" required={flightTripType === "roundtrip"} value={flightReturnDate} onChange={(e) => setFlightReturnDate(e.target.value)} />
+                    </div>
+                  )}
+                </div>
 
+                <div className="form-grid" style={{ marginBottom: "30px" }}>
                   <div className="form-group">
-                    <label>Ngày về {flightTripType === "oneway" && "(Không áp dụng)"}</label>
-                    <input
-                      type="date"
-                      required={flightTripType === "roundtrip"}
-                      disabled={flightTripType === "oneway"}
-                      value={flightReturnDate}
-                      min={flightDate || new Date().toISOString().split("T")[0]}
-                      onChange={(e) => setFlightReturnDate(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Hãng hàng không</label>
+                    <label>{t.form_airline}</label>
                     <select value={airline} onChange={(e) => setAirline(e.target.value)}>
                       <option value="Vietnam Airlines">Vietnam Airlines</option>
                       <option value="VietJet Air">VietJet Air</option>
                       <option value="Bamboo Airways">Bamboo Airways</option>
                     </select>
                   </div>
-
                   <div className="form-group">
-                    <label>Hạng ghế</label>
+                    <label>{t.form_seat_class}</label>
                     <select value={ticketClass} onChange={(e) => setTicketClass(e.target.value)}>
-                      <option value="Economy">Phổ thông (Economy)</option>
-                      <option value="Business">Thương gia (Business)</option>
+                      <option value="Economy">Economy (Phổ thông)</option>
+                      <option value="Business">Business (Thương gia)</option>
                     </select>
                   </div>
-
                   <div className="form-group">
-                    <label>Số lượng hành khách</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={flightGuests}
-                      onChange={(e) => setFlightGuests(parseInt(e.target.value) || 1)}
-                    />
+                    <label>{isEn ? "Number of Passengers" : "Số lượng khách"}</label>
+                    <input type="number" min="1" max="10" value={flightGuests} onChange={(e) => setFlightGuests(parseInt(e.target.value) || 1)} />
                   </div>
                 </div>
 
-                {/* Contact information details */}
-                <h4 style={{ borderTop: "1px solid rgba(13, 44, 84, 0.08)", paddingTop: "20px", marginBottom: "16px", color: "var(--primary)" }}>Thông Tin Liên Hệ Nhận Vé</h4>
-                
+                {/* Contact information */}
+                <h3 style={{ fontSize: "1.05rem", color: "var(--primary)", borderTop: "1px solid rgba(13,44,84,0.08)", paddingTop: "20px", marginBottom: "16px" }}>
+                  {isEn ? "Passenger Contact Details" : "Thông tin liên hệ người đặt vé"}
+                </h3>
                 <div className="form-grid" style={{ marginBottom: "30px" }}>
                   <div className="form-group">
-                    <label>Họ và tên người đặt</label>
-                    <input type="text" required placeholder="Nguyễn Văn A" value={name} onChange={(e) => setName(e.target.value)} />
+                    <label>{t.form_fullname}</label>
+                    <input type="text" required placeholder={isEn ? "Passenger name" : "Họ tên hành khách"} value={name} onChange={(e) => setName(e.target.value)} />
                   </div>
                   <div className="form-group">
-                    <label>Số điện thoại liên hệ</label>
-                    <input type="tel" required placeholder="0901234567" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                    <label>{t.form_phone}</label>
+                    <input type="tel" required placeholder="090..." value={phone} onChange={(e) => setPhone(e.target.value)} />
                   </div>
-                  <div className="form-group form-group-full">
-                    <label>Email nhận vé điện tử</label>
-                    <input type="email" required placeholder="email@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <div className="form-group" style={{ gridColumn: "span 2" }}>
+                    <label>{t.form_email}</label>
+                    <input type="email" required placeholder="example@mail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                   </div>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <button type="submit" className="btn btn-accent">
-                    <Search size={18} />
-                    Tìm & Đặt Vé Máy Bay
-                  </button>
-                </div>
+                <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "14px", borderRadius: "12px", display: "flex", justifyCenter: "center", gap: "8px", fontWeight: "bold" }}>
+                  <Search size={18} /> {t.form_btn_search}
+                </button>
               </form>
             )}
 
             {/* Ferry Booking Form */}
             {activeTab === "ferry" && (
               <form onSubmit={handleFerrySubmit}>
-                <div className="form-grid" style={{ marginBottom: "24px" }}>
+                <div className="form-grid" style={{ marginBottom: "20px" }}>
                   <div className="form-group">
-                    <label>Tuyến chạy</label>
+                    <label>{isEn ? "Route Option" : "Tuyến tàu chạy"}</label>
                     <select value={ferryRoute} onChange={(e) => setFerryRoute(e.target.value)}>
-                      <option value="Rạch Giá - Phú Quốc">Rạch Giá → Phú Quốc</option>
-                      <option value="Hà Tiên - Phú Quốc">Hà Tiên → Phú Quốc</option>
-                      <option value="Phú Quốc - Rạch Giá">Phú Quốc → Rạch Giá</option>
-                      <option value="Phú Quốc - Hà Tiên">Phú Quốc → Hà Tiên</option>
+                      <option value="Rạch Giá - Phú Quốc">Rạch Giá - Phú Quốc</option>
+                      <option value="Hà Tiên - Phú Quốc">Hà Tiên - Phú Quốc</option>
                     </select>
                   </div>
-
                   <div className="form-group">
-                    <label>Hãng tàu phà</label>
+                    <label>{t.form_date_dep}</label>
+                    <input type="date" required value={ferryDate} onChange={(e) => setFerryDate(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>{t.form_ferry_line}</label>
                     <select value={ferryBrand} onChange={(e) => setFerryBrand(e.target.value)}>
-                      <option value="Phú Quốc Express (5 sao)">Phú Quốc Express (Tàu 5 sao)</option>
-                      <option value="Tàu cao tốc Superdong">Tàu cao tốc Superdong</option>
-                      <option value="Phà cao tốc Thạnh Thới (Mang xe ô tô)">Phà cao tốc Thạnh Thới (Được mang ô tô/xe máy)</option>
+                      <option value="Phú Quốc Express">Phú Quốc Express (5 sao)</option>
+                      <option value="Superdong">Superdong (Tốc hành)</option>
                     </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Ngày khởi hành</label>
-                    <input
-                      type="date"
-                      required
-                      value={ferryDate}
-                      min={new Date().toISOString().split("T")[0]}
-                      onChange={(e) => setFerryDate(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Phương tiện mang theo</label>
-                    <select value={vehicleType} onChange={(e) => setVehicleType(e.target.value)}>
-                      <option value="Hành khách (không kèm xe)">Chỉ hành khách (Không mang xe)</option>
-                      <option value="Xe máy đi kèm">Xe máy đi kèm (+150k)</option>
-                      <option value="Ô tô từ 4-7 chỗ">Ô tô con 4-7 chỗ (+1.000k)</option>
-                    </select>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Số lượng hành khách</label>
-                    <input
-                      type="number"
-                      min="1"
-                      max="10"
-                      value={ferryGuests}
-                      onChange={(e) => setFerryGuests(parseInt(e.target.value) || 1)}
-                    />
                   </div>
                 </div>
 
-                {/* Contact information details */}
-                <h4 style={{ borderTop: "1px solid rgba(13, 44, 84, 0.08)", paddingTop: "20px", marginBottom: "16px", color: "var(--primary)" }}>Thông Tin Liên Hệ Nhận Vé</h4>
-                
                 <div className="form-grid" style={{ marginBottom: "30px" }}>
                   <div className="form-group">
-                    <label>Họ và tên người đặt</label>
-                    <input type="text" required placeholder="Nguyễn Văn A" value={name} onChange={(e) => setName(e.target.value)} />
+                    <label>{t.form_ferry_vehicle}</label>
+                    <select value={vehicleType} onChange={(e) => setVehicleType(e.target.value)}>
+                      <option value="Hành khách (không kèm xe)">Hành khách (không kèm xe)</option>
+                      <option value="Kèm Xe máy">Kèm Xe máy (+150k)</option>
+                      <option value="Kèm Ô tô">Kèm Ô tô (+1M)</option>
+                    </select>
                   </div>
                   <div className="form-group">
-                    <label>Số điện thoại liên hệ</label>
-                    <input type="tel" required placeholder="0901234567" value={phone} onChange={(e) => setPhone(e.target.value)} />
-                  </div>
-                  <div className="form-group form-group-full">
-                    <label>Email nhận vé điện tử</label>
-                    <input type="email" required placeholder="email@gmail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                    <label>{isEn ? "Number of Passengers" : "Số lượng khách"}</label>
+                    <input type="number" min="1" max="10" value={ferryGuests} onChange={(e) => setFerryGuests(parseInt(e.target.value) || 1)} />
                   </div>
                 </div>
 
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <button type="submit" className="btn btn-accent">
-                    <Search size={18} />
-                    Đặt Vé Tàu Cao Tốc
-                  </button>
+                {/* Contact information */}
+                <h3 style={{ fontSize: "1.05rem", color: "var(--primary)", borderTop: "1px solid rgba(13,44,84,0.08)", paddingTop: "20px", marginBottom: "16px" }}>
+                  {isEn ? "Passenger Contact Details" : "Thông tin liên hệ người đặt vé"}
+                </h3>
+                <div className="form-grid" style={{ marginBottom: "30px" }}>
+                  <div className="form-group">
+                    <label>{t.form_fullname}</label>
+                    <input type="text" required placeholder={isEn ? "Passenger name" : "Họ tên hành khách"} value={name} onChange={(e) => setName(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>{t.form_phone}</label>
+                    <input type="tel" required placeholder="090..." value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  </div>
+                  <div className="form-group" style={{ gridColumn: "span 2" }}>
+                    <label>{t.form_email}</label>
+                    <input type="email" required placeholder="example@mail.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  </div>
                 </div>
+
+                <button type="submit" className="btn btn-primary" style={{ width: "100%", padding: "14px", borderRadius: "12px", display: "flex", justifyCenter: "center", gap: "8px", fontWeight: "bold" }}>
+                  <Search size={18} /> {t.form_btn_search}
+                </button>
               </form>
             )}
           </div>
         ) : (
-          /* DIGITAL BOARDING PASS E-TICKET */
-          <div style={{ maxWidth: "650px", margin: "0 auto", animation: "fadeInUp 0.5s ease" }}>
+          /* ELECTRONIC TICKET BOARDING PASS VIEW */
+          <div style={{ maxWidth: "680px", margin: "0 auto" }}>
             <div className="boarding-pass-ticket">
-              <div className="boarding-pass-header" style={{ background: "var(--primary)", color: "var(--white)", padding: "20px 30px", borderTopLeftRadius: "24px", borderTopRightRadius: "24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div className="ticket-header" style={{ background: ticketData.type === "flight" ? "var(--primary)" : "linear-gradient(135deg, #028090, #00a896)" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  {ticketData.type === "flight" ? <Plane size={24} style={{ color: "var(--secondary)" }} /> : <Ship size={24} style={{ color: "var(--secondary)" }} />}
-                  <span style={{ fontWeight: 800, fontSize: "1.1rem", letterSpacing: "1px" }}>
-                    {ticketData.type === "flight" ? "E-BOARDING PASS" : "E-FERRY PASS"}
-                  </span>
+                  {ticketData.type === "flight" ? <Plane size={20} /> : <Ship size={20} />}
+                  <span className="ticket-header-title">{t.ticket_virtual_pass}</span>
                 </div>
-                <div style={{ fontSize: "0.85rem", opacity: 0.9, textAlign: "right" }}>
-                  <strong>MÃ VÉ:</strong> {ticketData.ticketNo}
-                </div>
+                <span style={{ fontSize: "0.8rem", fontWeight: 700, letterSpacing: "1px" }}>{ticketData.ticketNo}</span>
               </div>
 
-              <div className="boarding-pass-body" style={{ background: "var(--white)", borderLeft: "2px dashed rgba(13, 44, 84, 0.15)", borderRight: "2px dashed rgba(13, 44, 84, 0.15)", padding: "30px", position: "relative" }}>
-                {/* Route Header */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-                  <div>
-                    <h3 style={{ fontSize: "1.8rem", color: "var(--primary)" }}>
-                      {ticketData.type === "flight" ? ticketData.from.match(/\(([^)]+)\)/)?.[1] || "SGN" : ticketData.route.split(" - ")[0]}
-                    </h3>
-                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block" }}>
-                      {ticketData.type === "flight" ? ticketData.from.split(" (")[0] : "Điểm khởi hành"}
-                    </span>
+              <div className="ticket-body">
+                <div className="ticket-row-grid">
+                  <div className="ticket-field">
+                    <span className="ticket-lbl">{t.ticket_passenger}</span>
+                    <span className="ticket-val" style={{ textTransform: "uppercase", fontWeight: 700 }}>{ticketData.name}</span>
                   </div>
-                  
-                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
-                    {ticketData.type === "flight" ? <Plane size={20} style={{ color: "var(--secondary)" }} /> : <Ship size={20} style={{ color: "var(--secondary)" }} />}
-                    <div style={{ width: "100px", height: "2px", background: "dashed rgba(13, 44, 84, 0.2)", position: "relative" }}>
-                      <span style={{ position: "absolute", top: "-8px", left: "40%", width: "16px", height: "16px", borderRadius: "50%", background: "#e2e8f0", display: "flex", alignItems: "center", justifyCenter: "center" }} />
-                    </div>
+                  <div className="ticket-field">
+                    <span className="ticket-lbl">{t.ticket_flight}</span>
+                    <span className="ticket-val" style={{ color: "var(--secondary)", fontWeight: 700 }}>{ticketData.flightNo}</span>
                   </div>
-
-                  <div style={{ textAlign: "right" }}>
-                    <h3 style={{ fontSize: "1.8rem", color: "var(--secondary)" }}>PQC</h3>
-                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", display: "block" }}>Phú Quốc</span>
+                  <div className="ticket-field">
+                    <span className="ticket-lbl">{t.ticket_seat}</span>
+                    <span className="ticket-val" style={{ fontWeight: 700 }}>{ticketData.seatNo}</span>
                   </div>
                 </div>
 
-                {/* Details Grid */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "20px 16px", borderBottom: "1px dashed #cbd5e1", paddingBottom: "24px", marginBottom: "24px" }}>
-                  <div>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>
-                      {ticketData.type === "flight" ? "Chuyến Bay" : "Mã Số Tàu"}
-                    </span>
-                    <strong style={{ fontSize: "1rem", color: "var(--primary)" }}>{ticketData.type === "flight" ? ticketData.flightNo : ticketData.ferryNo}</strong>
+                <div className="ticket-route-row">
+                  <div className="ticket-route-node">
+                    <span className="route-city">{ticketData.from}</span>
                   </div>
-                  <div>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Ghế Ngồi</span>
-                    <strong style={{ fontSize: "1rem", color: "var(--primary)" }}>{ticketData.seatNo}</strong>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexGrow: 1, position: "relative" }}>
+                    <ArrowRightLeft size={18} style={{ color: "var(--secondary)" }} />
+                    <div style={{ width: "100%", height: "2px", borderBottom: "2px dashed #cbd5e1", marginTop: "4px" }} />
                   </div>
-                  <div>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Hạng Vé</span>
-                    <strong style={{ fontSize: "1rem", color: "var(--secondary)" }}>{ticketData.type === "flight" ? ticketData.ticketClass : "Tiêu Chuẩn"}</strong>
-                  </div>
-                  
-                  <div>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Ngày đi</span>
-                    <strong style={{ fontSize: "0.9rem", color: "var(--primary)" }}>{new Date(ticketData.date).toLocaleDateString("vi-VN")}</strong>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Hãng vận chuyển</span>
-                    <strong style={{ fontSize: "0.9rem", color: "var(--primary)" }}>{ticketData.type === "flight" ? ticketData.airline : ticketData.brand.split(" (")[0]}</strong>
-                  </div>
-                  <div>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Số Khách</span>
-                    <strong style={{ fontSize: "0.9rem", color: "var(--primary)" }}>{ticketData.guests} Khách</strong>
-                  </div>
-
-                  {ticketData.type === "ferry" && ticketData.vehicleType !== "Hành khách (không kèm xe)" && (
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Phương tiện đi kèm</span>
-                      <strong style={{ fontSize: "0.9rem", color: "var(--primary)" }}>{ticketData.vehicleType}</strong>
-                    </div>
-                  )}
-
-                  {ticketData.returnDate && (
-                    <div style={{ gridColumn: "1 / -1" }}>
-                      <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Ngày về (Khứ hồi)</span>
-                      <strong style={{ fontSize: "0.9rem", color: "var(--primary)" }}>{new Date(ticketData.returnDate).toLocaleDateString("vi-VN")}</strong>
-                    </div>
-                  )}
-                </div>
-
-                {/* Passenger & Price info */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                  <div>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Hành khách</span>
-                    <strong style={{ fontSize: "1.1rem", color: "var(--primary)" }}>{ticketData.name}</strong>
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", display: "block", textTransform: "uppercase" }}>Tổng thanh toán</span>
-                    <strong style={{ fontSize: "1.3rem", color: "var(--secondary)" }}>{formatPrice(ticketData.price)} đ</strong>
+                  <div className="ticket-route-node" style={{ alignItems: "flex-end" }}>
+                    <span className="route-city">{ticketData.to}</span>
                   </div>
                 </div>
 
-                {/* Barcode and support info */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", paddingTop: "20px", borderTop: "1px dashed #cbd5e1" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.75rem", color: "#10b981", fontWeight: 700 }}>
-                    <ShieldCheck size={16} />
-                    Vé đã xác nhận & thanh toán
+                <div className="ticket-row-grid">
+                  <div className="ticket-field">
+                    <span className="ticket-lbl">{t.ticket_date}</span>
+                    <span className="ticket-val">{new Date(ticketData.date).toLocaleDateString("vi-VN")}</span>
                   </div>
-                  <div className="receipt-barcode" style={{ margin: 0 }}>
-                    <div className="barcode-lines" style={{ width: "120px", height: "30px" }} />
-                    <span className="barcode-text" style={{ fontSize: "0.6rem" }}>{ticketData.ticketNo}</span>
+                  <div className="ticket-field">
+                    <span className="ticket-lbl">{t.ticket_time}</span>
+                    <span className="ticket-val">{ticketData.type === "flight" ? "07:30" : "08:00"}</span>
+                  </div>
+                  <div className="ticket-field">
+                    <span className="ticket-lbl">{t.ticket_class}</span>
+                    <span className="ticket-val">{ticketData.ticketClass}</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Reset action button */}
-              <div style={{ background: "#f8fafc", padding: "20px 30px", borderBottomLeftRadius: "24px", borderBottomRightRadius: "24px", borderTop: "2px dashed #cbd5e1", display: "flex", justifyCenter: "center", alignItems: "center" }}>
-                <button className="btn btn-outline" onClick={resetForm} style={{ width: "100%", borderRadius: "12px" }}>
-                  Tạo Lượt Đặt Vé Mới
-                </button>
+                {ticketData.returnDate && (
+                  <div style={{ marginTop: "12px", padding: "8px 12px", background: "#f8fafc", borderRadius: "8px", fontSize: "0.8rem", color: "var(--text-muted)", border: "1px solid rgba(0,0,0,0.03)" }}>
+                    🔄 {isEn ? "Return Flight Departure Date" : "Ngày bay khứ hồi khứ hồi"}: <strong>{new Date(ticketData.returnDate).toLocaleDateString("vi-VN")}</strong> (Được xuất kèm tự động)
+                  </div>
+                )}
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "24px", paddingTop: "16px", borderTop: "1px dashed #cbd5e1" }}>
+                  <div>
+                    <span className="ticket-lbl">{isEn ? "Total Price Paid" : "Tổng tiền đã thanh toán"}</span>
+                    <strong style={{ fontSize: "1.3rem", color: "var(--secondary)" }}>{formatPrice(ticketData.price)} VNĐ</strong>
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px", color: "#10b981", fontSize: "0.8rem", fontWeight: 700 }}>
+                    <ShieldCheck size={18} />
+                    {isEn ? "E-Ticket Verified" : "Đã Xác Thực Đặt"}
+                  </div>
+                </div>
+
+                <div className="ticket-barcode" style={{ marginTop: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+                  <div className="barcode-lines" style={{ width: "100%", height: "40px", background: "repeating-linear-gradient(90deg, #000, #000 2px, #fff 2px, #fff 8px)" }} />
+                  <span style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: "4px" }}>{ticketData.ticketNo} - {t.ticket_warning}</span>
+                </div>
               </div>
             </div>
+
+            <button className="btn btn-outline" onClick={handleReset} style={{ width: "100%", marginTop: "20px", padding: "12px", borderRadius: "10px", fontWeight: "bold" }}>
+              {isEn ? "Book Another Trip" : "Đặt Vé Khác / Trở Lại"}
+            </button>
           </div>
         )}
       </div>
