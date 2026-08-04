@@ -24,6 +24,7 @@ export default function App() {
   // Global Bilingual Language State
   const [language, setLanguage] = useState(() => localStorage.getItem("pq_lang") || "vi");
   const t = translations[language];
+  const isEn = language === "en";
 
   // Dynamic database states loaded from mock backend API
   const [builderDatabase, setBuilderDatabase] = useState(() => apiService.getDbServices());
@@ -405,7 +406,7 @@ export default function App() {
                 <input 
                   type="text" 
                   required 
-                  placeholder="Username (e.g. admin / nam10)" 
+                  placeholder={isEn ? "Enter username" : "Nhập tên tài khoản"} 
                   value={loginUsername} 
                   onChange={(e) => setLoginUsername(e.target.value)} 
                   style={{ width: "100%" }}
@@ -417,7 +418,7 @@ export default function App() {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required 
-                  placeholder="Password (e.g. admin123 / nam123)" 
+                  placeholder={isEn ? "Enter password" : "Nhập mật khẩu"} 
                   value={loginPassword} 
                   onChange={(e) => setLoginPassword(e.target.value)} 
                   style={{ width: "100%", paddingRight: "40px" }}
