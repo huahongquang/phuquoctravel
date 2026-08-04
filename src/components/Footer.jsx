@@ -101,7 +101,7 @@ export default function Footer({ setActiveSection }) {
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Phú Quốc Travel. All rights reserved. Thiết kế bởi Antigravity.</p>
+          <p>&copy; {new Date().getFullYear()} Phú Quốc Travel. All rights reserved.</p>
           <div style={{ display: "flex", gap: "20px" }}>
             <a href="#" style={{ color: "rgba(255,255,255,0.5)" }}>Chính sách bảo mật</a>
             <a href="#" style={{ color: "rgba(255,255,255,0.5)" }}>Điều khoản dịch vụ</a>
