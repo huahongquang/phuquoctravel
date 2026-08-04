@@ -261,6 +261,7 @@ export default function App() {
     return (
       <AdminDashboard
         db={builderDatabase}
+        language={language}
         onAddItem={handleAddDbItem}
         onDeleteItem={handleDeleteDbItem}
         onUpdateItem={handleUpdateDbItem}
