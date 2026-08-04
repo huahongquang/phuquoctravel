@@ -15,7 +15,7 @@ export const apiService = {
   // Load all databases
   initDatabase() {
     let tours = localStorage.getItem(KEYS.TOURS);
-    if (!tours || !tours.includes("name_en")) {
+    if (!tours || !tours.includes("itinerary")) {
       localStorage.setItem(KEYS.TOURS, JSON.stringify(toursData));
     }
 
@@ -25,7 +25,7 @@ export const apiService = {
     }
 
     let blogs = localStorage.getItem(KEYS.BLOGS);
-    if (!blogs) {
+    if (!blogs || !blogs.includes("title_en")) {
       localStorage.setItem(KEYS.BLOGS, JSON.stringify(initialBlogData));
     }
 

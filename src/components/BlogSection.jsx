@@ -25,7 +25,7 @@ export default function BlogSection({ blogs, language }) {
               <div className="tour-img-wrapper" style={{ height: "180px" }}>
                 <img src={post.image || "/images/phu_quoc_hero.jpg"} alt={post.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 <span className="badge tour-tag" style={{ background: "var(--secondary)" }}>
-                  {post.category}
+                  {isEn ? (post.category_en || post.category) : post.category}
                 </span>
               </div>
               <div className="tour-content" style={{ padding: "20px" }}>
@@ -40,9 +40,9 @@ export default function BlogSection({ blogs, language }) {
                       {post.date}
                     </span>
                   </div>
-                  <h3 style={{ fontSize: "1.1rem", marginBottom: "8px", color: "var(--primary)", lineHeight: 1.4 }}>{post.title}</h3>
+                  <h3 style={{ fontSize: "1.1rem", marginBottom: "8px", color: "var(--primary)", lineHeight: 1.4 }}>{isEn ? (post.title_en || post.title) : post.title}</h3>
                   <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "16px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    {post.summary}
+                    {isEn ? (post.summary_en || post.summary) : post.summary}
                   </p>
                 </div>
                 <button
@@ -70,7 +70,7 @@ export default function BlogSection({ blogs, language }) {
           >
             <div className="modal-header" style={{ background: "var(--primary)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <span className="badge" style={{ background: "var(--secondary)", color: "var(--white)" }}>{selectedPost.category}</span>
+                <span className="badge" style={{ background: "var(--secondary)", color: "var(--white)" }}>{isEn ? (selectedPost.category_en || selectedPost.category) : selectedPost.category}</span>
                 <span style={{ fontSize: "0.8rem", opacity: 0.9 }}>
                   {isEn ? "By: " : "Bởi: "}{selectedPost.author} • {isEn ? "Published" : "Đăng ngày"} {selectedPost.date}
                 </span>
@@ -90,13 +90,13 @@ export default function BlogSection({ blogs, language }) {
               </div>
               
               <h2 style={{ fontSize: "1.8rem", color: "var(--primary)", marginBottom: "20px", lineHeight: 1.3 }}>
-                {selectedPost.title}
+                {isEn ? (selectedPost.title_en || selectedPost.title) : selectedPost.title}
               </h2>
               
               <div 
                 style={{ fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.7 }}
                 dangerouslySetInnerHTML={{ 
-                  __html: selectedPost.content
+                  __html: (isEn ? (selectedPost.content_en || selectedPost.content) : selectedPost.content)
                     .replace(/\n\n/g, "</p><p style='margin-bottom: 16px;'>")
                     .replace(/### (.*)/g, "<h3 style='font-size: 1.25rem; color: var(--primary); margin-top: 24px; margin-bottom: 12px; font-weight: 700;'>$1</h3>")
                     .replace(/## (.*)/g, "<h2 style='font-size: 1.45rem; color: var(--primary); margin-top: 28px; margin-bottom: 16px; font-weight: 800;'>$1</h2>")
