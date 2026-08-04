@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import TourList from "./components/TourList";
 import AIChatbot from "./components/AIChatbot";
+import TransportBooking from "./components/TransportBooking";
 import BookingModal from "./components/BookingModal";
 import Cart from "./components/Cart";
 import Footer from "./components/Footer";
@@ -102,6 +103,9 @@ export default function App() {
 
       {/* Tours Section */}
       <TourList onBookClick={handleOpenAddToCart} />
+
+      {/* Transport Booking Section */}
+      <TransportBooking />
 
       {/* AI Recommendation Chatbot Section */}
       <AIChatbot onBookTour={handleOpenAddToCart} />

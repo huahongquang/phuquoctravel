@@ -1220,3 +1220,35 @@ footer p {
   color: rgba(255, 255, 255, 0.5);
   font-size: 0.85rem;
 }
+
+/* --- BOARDING PASS E-TICKET --- */
+.boarding-pass-ticket {
+  box-shadow: 0 15px 45px rgba(13, 44, 84, 0.12);
+  border-radius: 24px;
+  overflow: hidden;
+  position: relative;
+  background: var(--white);
+}
+
+.boarding-pass-body::before,
+.boarding-pass-body::after {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background: var(--background);
+  border-radius: 50%;
+  bottom: 84px;
+  z-index: 10;
+}
+
+.boarding-pass-body::before {
+  left: -12px;
+  box-shadow: inset -3px 0 5px rgba(13, 44, 84, 0.04);
+}
+
+.boarding-pass-body::after {
+  right: -12px;
+  box-shadow: inset 3px 0 5px rgba(13, 44, 84, 0.04);
+}
+

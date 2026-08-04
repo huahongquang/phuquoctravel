@@ -21,6 +21,7 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
   const navItems = [
     { id: "hero", label: "Trang Chủ" },
     { id: "tours", label: "Tour Du Lịch" },
+    { id: "transport", label: "Vé Máy Bay & Phà" },
     { id: "ai-planner", label: "Trợ Lý AI" }
   ];
 

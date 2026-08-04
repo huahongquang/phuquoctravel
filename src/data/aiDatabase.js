@@ -89,21 +89,30 @@ export const aiDatabase = {
       tags: ["beach", "swimming", "relax", "family"],
       description: "Bãi biển đẹp và nổi tiếng bậc nhất Phú Quốc với bãi cát trắng mịn như kem và làn nước trong xanh màu ngọc bích êm ả, sóng nhẹ, an toàn cho cả gia đình tắm biển.",
       recommendedTourId: "tour-4-islands"
+    },
+    {
+      id: "bat-ca-ngu-dan",
+      name: "Đánh bắt cá & Cắm trại cùng Ngư Dân",
+      area: "Đông Nam Đảo",
+      category: "nature",
+      tags: ["fishing", "local-life", "camping", "wild", "adventure"],
+      description: "Trải nghiệm nhập vai làm ngư dân Phú Quốc thực thụ. Ra khơi thả lưới kéo cá cùng thủy thủ đoàn trên tàu gỗ truyền thống, nướng cá trực tiếp dã ngoại bên bờ cát hoang vắng.",
+      recommendedTourId: "tour-fishing-local"
     }
   ],
 
   // Các từ khóa phân tích ý định người dùng (Intent Keywords)
   intentKeywords: {
     adventure: ["mạo hiểm", "cano", "cáp treo", "lặn", "san hô", "công viên nước", "vui chơi", "trượt nước", "leo núi", "trekking", "rừng"],
-    nature: ["thiên nhiên", "hoang sơ", "sao biển", "rừng", "sông", "rạch vẹm", "gành dầu", "suối", "hoang dã", "cảnh đẹp"],
+    nature: ["thiên nhiên", "hoang sơ", "sao biển", "rừng", "sông", "rạch vẹm", "gành dầu", "suối", "hoang dã", "cảnh đẹp", "bắt cá", "ngư dân", "câu cá", "thả lưới", "kéo lưới", "cắm trại", "dã ngoại"],
     culture: ["lịch sử", "văn hóa", "nhà tù", "chùa", "hộ quốc", "nguyễn trung trực", "đền", "tâm linh", "làng chài", "truyền thống"],
     leisure: ["nghỉ dưỡng", "thư giãn", "hoàng hôn", "câu mực", "lãng mạn", "tắm biển", "gia đình", "chợ đêm", "ăn uống", "hải sản"]
   },
 
   // Câu trả lời mặc định khi AI tư vấn
   defaultResponses: {
-    welcome: "Xin chào! Mình là **Trợ lý AI Du lịch Phú Quốc**. Mình có thể giúp bạn tìm kiếm các điểm trải nghiệm tuyệt vời và gợi ý các tour du lịch phù hợp nhất với sở thích của bạn ở Đảo Ngọc.\n\nBạn thích phong cách du lịch nào dưới đây nhất?\n1. **Khám phá mạo hiểm** (Cano, cáp treo, lặn san hô, công viên nước)\n2. **Hòa mình cùng thiên nhiên hoang sơ** (Sao biển Rạch Vẹm, Rừng quốc gia, Gành Dầu)\n3. **Tìm hiểu Văn hóa - Lịch sử** (Nhà tù Phú Quốc, Chùa Hộ Quốc, Đền Nguyễn Trung Trực)\n4. **Nghỉ dưỡng & Trải nghiệm lãng mạn** (Tắm biển Bãi Sao, đón hoàng hôn trên du thuyền, câu mực đêm)",
+    welcome: "Xin chào! Mình là **Trợ lý AI Du lịch Phú Quốc**. Mình có thể giúp bạn tìm kiếm các điểm trải nghiệm tuyệt vời và gợi ý các tour du lịch phù hợp nhất với sở thích của bạn ở Đảo Ngọc.\n\nBạn thích phong cách du lịch nào dưới đây nhất?\n1. **Khám phá mạo hiểm** (Cano, cáp treo, lặn san hô, công viên nước)\n2. **Trải nghiệm thiên nhiên & làm ngư dân** (Bắt cá cùng ngư dân, cắm trại dã ngoại, ngắm sao biển Rạch Vẹm, trekking rừng)\n3. **Tìm hiểu Văn hóa - Lịch sử** (Nhà tù Phú Quốc, Chùa Hộ Quốc, Đền Nguyễn Trung Trực)\n4. **Nghỉ dưỡng & Trải nghiệm lãng mạn** (Tắm biển Bãi Sao, đón hoàng hôn trên du thuyền, câu mực đêm)",
     
-    notFound: "Cảm ơn bạn đã chia sẻ! Hiện tại mình chưa phân tích được rõ từ khóa này. Bạn có thể chọn 1 trong 4 chủ đề gợi ý trên, hoặc nói rõ hơn mong muốn của bạn (ví dụ: 'mình muốn đi lặn san hô', 'muốn ngắm sao biển', hoặc 'muốn đi cùng gia đình nghỉ dưỡng') để mình hỗ trợ nhé!"
+    notFound: "Cảm ơn bạn đã chia sẻ! Hiện tại mình chưa phân tích được rõ từ khóa này. Bạn có thể chọn 1 trong các chủ đề gợi ý trên, hoặc nói rõ hơn mong muốn của bạn (ví dụ: 'mình muốn đi bắt cá cùng ngư dân', 'muốn đi lặn san hô', 'muốn ngắm sao biển', hoặc 'muốn đi cùng gia đình nghỉ dưỡng') để mình hỗ trợ nhé!"
   }
 };

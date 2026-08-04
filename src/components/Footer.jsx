@@ -44,6 +44,11 @@ export default function Footer({ setActiveSection }) {
                 </a>
               </li>
               <li>
+                <a href="#transport" onClick={(e) => { e.preventDefault(); handleNavClick("transport"); }}>
+                  Vé Máy Bay & Phà
+                </a>
+              </li>
+              <li>
                 <a href="#ai-planner" onClick={(e) => { e.preventDefault(); handleNavClick("ai-planner"); }}>
                   Trợ lý Tư vấn AI
                 </a>
