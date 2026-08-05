@@ -6,7 +6,7 @@ export const translations = {
     nav_builder: "Tự Thiết Kế Tour",
     nav_transport: "Vé Máy Bay & Phà",
     nav_ai: "Trợ Lý AI",
-    nav_login: "Đăng Nhập Portal",
+    nav_login: "Đăng Nhập",
     nav_logout: "Đăng xuất",
 
     // Hero Section
@@ -122,7 +122,7 @@ export const translations = {
     nav_builder: "Custom Tour Builder",
     nav_transport: "Flights & Ferries",
     nav_ai: "AI Assistant",
-    nav_login: "Portal Login",
+    nav_login: "Login",
     nav_logout: "Logout",
 
     // Hero Section
