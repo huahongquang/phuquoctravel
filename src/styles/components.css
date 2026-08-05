@@ -2402,6 +2402,10 @@ table td {
     grid-template-columns: 1fr;
     gap: 30px;
     padding: 30px;
+    min-width: 0;
+  }
+  .detail-content-column {
+    min-width: 0;
   }
   .booking-widget-card {
     position: static;
@@ -2409,20 +2413,47 @@ table td {
 }
 
 @media (max-width: 768px) {
+  .modal-overlay {
+    padding: 0 !important;
+  }
+  .tour-detail-modal {
+    width: 100% !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+  .booking-modal {
+    width: 92% !important;
+    max-height: 95vh !important;
+    border-radius: 16px !important;
+  }
+  .close-detail-modal-btn {
+    top: 16px !important;
+    right: 16px !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--primary) !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
+  }
   .detail-hero-banner {
-    height: 250px;
+    height: 220px;
   }
   .detail-hero-overlay {
-    padding: 20px;
+    padding: 16px;
   }
   .detail-hero-info h2 {
-    font-size: 1.5rem;
+    font-size: 1.35rem;
   }
   .detail-breadcrumbs {
-    padding: 12px 20px;
+    padding: 12px 16px;
   }
   .detail-main-layout {
-    padding: 20px;
+    padding: 16px;
+    min-width: 0;
+  }
+  .detail-content-column {
+    min-width: 0;
   }
   .highlights-grid, .inclusions-columns, .meals-menu-grid {
     grid-template-columns: 1fr;
