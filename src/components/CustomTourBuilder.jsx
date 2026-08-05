@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plane, Ship, Hotel, Utensils, Compass, Plus, Trash2, ArrowUp, ArrowDown, ShoppingBag, Sparkles, AlertCircle, X } from "lucide-react";
+import { Plane, Ship, Hotel, Utensils, Compass, Plus, Trash2, ArrowUp, ArrowDown, ShoppingBag, Sparkles, AlertCircle, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { translations } from "../data/translations";
 
 export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatabase, language }) {
@@ -340,12 +340,70 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
             <div className="modal-body" style={{ padding: "24px 30px", maxHeight: "75vh", overflowY: "auto" }}>
               {selectedService.gallery && selectedService.gallery.length > 0 ? (
                 <div>
-                  <div style={{ width: "100%", height: "260px", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
+                  <div style={{ position: "relative", width: "100%", height: "260px", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
                     <img 
                       src={selectedService.gallery[activeImageIdx] || selectedService.image} 
                       alt={selectedService.name} 
                       style={{ width: "100%", height: "100%", objectFit: "cover" }} 
                     />
+                    
+                    {/* Prev Button Overlay */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveImageIdx((prev) => (prev === 0 ? selectedService.gallery.length - 1 : prev - 1))}
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        left: "12px",
+                        transform: "translateY(-50%)",
+                        background: "rgba(13, 44, 84, 0.65)",
+                        border: "none",
+                        color: "var(--white)",
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        transition: "var(--transition)",
+                        zIndex: 10,
+                        backdropFilter: "blur(4px)"
+                      }}
+                      title={isEn ? "Previous Image" : "Hình trước"}
+                      className="gallery-nav-overlay-btn"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+
+                    {/* Next Button Overlay */}
+                    <button
+                      type="button"
+                      onClick={() => setActiveImageIdx((prev) => (prev === selectedService.gallery.length - 1 ? 0 : prev + 1))}
+                      style={{
+                        position: "absolute",
+                        top: "50%",
+                        right: "12px",
+                        transform: "translateY(-50%)",
+                        background: "rgba(13, 44, 84, 0.65)",
+                        border: "none",
+                        color: "var(--white)",
+                        width: "36px",
+                        height: "36px",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        transition: "var(--transition)",
+                        zIndex: 10,
+                        backdropFilter: "blur(4px)"
+                      }}
+                      title={isEn ? "Next Image" : "Hình tiếp theo"}
+                      className="gallery-nav-overlay-btn"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
                   </div>
                   
                   {/* Thumbnail Row */}

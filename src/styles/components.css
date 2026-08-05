@@ -2987,6 +2987,12 @@ table td {
   }
 }
 
+/* Gallery navigation overlay buttons hover */
+.gallery-nav-overlay-btn:hover {
+  background: var(--secondary) !important;
+  transform: translateY(-50%) scale(1.1) !important;
+}
+
 
 
 
