@@ -157,7 +157,7 @@ export default function BookingModal({
                   {t.modal_title_checkout}
                 </h3>
                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                  {cartItems.length} {isEn ? "items in cart" : "dịch vụ trong giỏ hàng"}
+                  {cartItems.length} {isEn ? "selected services" : "dịch vụ đã chọn"}
                 </span>
               </div>
             </div>

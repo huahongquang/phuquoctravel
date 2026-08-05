@@ -78,13 +78,13 @@ export const translations = {
     ai_btn_send: "Gửi",
 
     // Cart Drawer
-    cart_title: "Giỏ Hàng Đã Chọn",
-    cart_empty: "Giỏ hàng của bạn đang trống.",
+    cart_title: "Hành Trình Đã Chọn",
+    cart_empty: "Hành trình của bạn đang trống.",
     cart_total: "Tổng thanh toán:",
     cart_btn_checkout: "Tiến Hành Đặt Chỗ",
 
     // Modal Booking
-    modal_title_add: "Thêm Vào Giỏ Hàng",
+    modal_title_add: "Thêm Vào Hành Trình",
     modal_title_checkout: "Thông Tin Đặt Chỗ",
     modal_title_receipt: "Vé Đặt Chỗ Thành Công",
     form_fullname: "Họ và tên khách hàng",
@@ -93,7 +93,7 @@ export const translations = {
     form_date_start: "Ngày khởi hành",
     form_qty_adult: "Số khách người lớn",
     form_qty_child: "Số khách trẻ em (Dưới 1m)",
-    btn_add_to_cart: "Thêm Vào Giỏ Hàng",
+    btn_add_to_cart: "Thêm Vào Hành Trình",
     btn_confirm_booking: "Xác Nhận & Tạo Vé Điện Tử",
     receipt_subtitle: "Vui lòng xuất trình vé này tại điểm đón khách",
     receipt_code: "Mã Đặt Chỗ",
@@ -194,13 +194,13 @@ export const translations = {
     ai_btn_send: "Send",
 
     // Cart Drawer
-    cart_title: "Selected Bookings",
-    cart_empty: "Your cart is currently empty.",
+    cart_title: "Selected Itinerary",
+    cart_empty: "Your itinerary is currently empty.",
     cart_total: "Total Payout:",
     cart_btn_checkout: "Proceed to Checkout",
 
     // Modal Booking
-    modal_title_add: "Add to Selected Cart",
+    modal_title_add: "Add to Itinerary",
     modal_title_checkout: "Booking Information",
     modal_title_receipt: "Booking Successful Receipt",
     form_fullname: "Customer Full Name",
@@ -209,7 +209,7 @@ export const translations = {
     form_date_start: "Departure Date",
     form_qty_adult: "Number of Adults",
     form_qty_child: "Number of Children (Under 1m)",
-    btn_add_to_cart: "Add to Selection",
+    btn_add_to_cart: "Add to Itinerary",
     btn_confirm_booking: "Confirm & Generate E-Tickets",
     receipt_subtitle: "Please present this e-ticket at the pickup point",
     receipt_code: "Booking ID",

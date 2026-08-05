@@ -55,7 +55,7 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
           <button 
             className="cart-icon-btn" 
             onClick={onCartClick}
-            aria-label="Giỏ hàng tour"
+            aria-label={language === "vi" ? "Hành trình đã chọn" : "Selected itinerary"}
             style={{ width: "36px", height: "36px" }}
           >
             <ShoppingCart size={18} />
@@ -101,7 +101,7 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
           <button 
             className="cart-icon-btn" 
             onClick={onCartClick}
-            aria-label="Giỏ hàng tour"
+            aria-label={language === "vi" ? "Hành trình đã chọn" : "Selected itinerary"}
             id="btn-cart-toggle"
           >
             <ShoppingCart size={20} />
