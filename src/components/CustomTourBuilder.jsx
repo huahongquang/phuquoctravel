@@ -7,6 +7,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
   const [timeline, setTimeline] = useState([]);
   const [showMediaId, setShowMediaId] = useState(null);
   const [selectedService, setSelectedService] = useState(null);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
   const t = translations[language || "vi"];
   const isEn = language === "en";
 
@@ -149,7 +150,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
 
                       <button
                         type="button"
-                        onClick={() => setSelectedService(item)}
+                        onClick={() => { setSelectedService(item); setActiveImageIdx(0); }}
                         style={{
                           background: "none",
                           border: "none",
@@ -337,10 +338,47 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
 
             {/* Modal Body */}
             <div className="modal-body" style={{ padding: "24px 30px", maxHeight: "75vh", overflowY: "auto" }}>
-              {selectedService.image && (
-                <div style={{ width: "100%", height: "220px", borderRadius: "12px", overflow: "hidden", marginBottom: "20px" }}>
-                  <img src={selectedService.image} alt={selectedService.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              {selectedService.gallery && selectedService.gallery.length > 0 ? (
+                <div>
+                  <div style={{ width: "100%", height: "260px", borderRadius: "12px", overflow: "hidden", marginBottom: "12px" }}>
+                    <img 
+                      src={selectedService.gallery[activeImageIdx] || selectedService.image} 
+                      alt={selectedService.name} 
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                    />
+                  </div>
+                  
+                  {/* Thumbnail Row */}
+                  <div style={{ display: "flex", gap: "10px", marginBottom: "20px", overflowX: "auto", paddingBottom: "6px" }}>
+                    {selectedService.gallery.map((img, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveImageIdx(idx)}
+                        style={{
+                          width: "70px",
+                          height: "50px",
+                          borderRadius: "6px",
+                          overflow: "hidden",
+                          border: activeImageIdx === idx ? "2px solid var(--secondary)" : "1px solid rgba(0,0,0,0.08)",
+                          padding: 0,
+                          cursor: "pointer",
+                          transition: "var(--transition)",
+                          opacity: activeImageIdx === idx ? 1 : 0.7,
+                          flexShrink: 0
+                        }}
+                      >
+                        <img src={img} alt={`Thumb ${idx}`} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      </button>
+                    ))}
+                  </div>
                 </div>
+              ) : (
+                selectedService.image && (
+                  <div style={{ width: "100%", height: "220px", borderRadius: "12px", overflow: "hidden", marginBottom: "20px" }}>
+                    <img src={selectedService.image} alt={selectedService.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  </div>
+                )
               )}
 
               <h3 style={{ color: "var(--primary)", fontSize: "1.4rem", fontWeight: 800, marginBottom: "8px" }}>

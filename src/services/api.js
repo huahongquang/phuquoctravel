@@ -20,7 +20,7 @@ export const apiService = {
     }
 
     let services = localStorage.getItem(KEYS.DB_SERVICES);
-    if (!services || !services.includes("unsplash.com") || !services.includes("dn-tk-1") || !services.includes("ht-ab-3")) {
+    if (!services || !services.includes("unsplash.com") || !services.includes("gallery") || !services.includes("dn-tk-1") || !services.includes("ht-ab-3")) {
       localStorage.setItem(KEYS.DB_SERVICES, JSON.stringify(initialBuilderDatabase));
     }
 
