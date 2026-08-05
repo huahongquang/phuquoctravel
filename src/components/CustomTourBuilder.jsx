@@ -6,6 +6,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
   const [activeCategory, setActiveCategory] = useState("hotel");
   const [timeline, setTimeline] = useState([]);
   const [showMediaId, setShowMediaId] = useState(null);
+  const [selectedService, setSelectedService] = useState(null);
   const t = translations[language || "vi"];
   const isEn = language === "en";
 
@@ -142,9 +143,30 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                       </div>
                     )}
 
-                    <div className="bank-item-info-body" style={{ padding: "16px 16px 0 16px", flexGrow: 1 }}>
+                    <div className="bank-item-info-body" style={{ padding: "16px 16px 0 16px", flexGrow: 1, display: "flex", flexDirection: "column", gap: "8px" }}>
                       <h4 className="bank-item-name">{displayName}</h4>
-                      <p className="bank-item-desc" style={{ marginTop: "6px" }}>{displayDesc}</p>
+                      <p className="bank-item-desc">{displayDesc}</p>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedService(item)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          color: "var(--secondary)",
+                          fontSize: "0.78rem",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                          padding: 0,
+                          textAlign: "left",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "4px",
+                          width: "fit-content"
+                        }}
+                      >
+                        🔎 {isEn ? "View Details" : "Xem chi tiết"}
+                      </button>
 
                       {/* Video/Youtube indicator stay clean */}
                       {item.youtube && (
@@ -293,6 +315,142 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
           </div>
         </div>
       </div>
+      {/* SERVICE DETAIL MODAL */}
+      {selectedService && (
+        <div className="modal-overlay open" onClick={() => setSelectedService(null)} style={{ zIndex: 1500 }}>
+          <div className="booking-modal animate-scale-up" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "650px", width: "100%" }}>
+            
+            {/* Modal Header */}
+            <div className="modal-header" style={{ background: "var(--primary)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <span className="badge" style={{ background: "var(--secondary)", color: "var(--white)", textTransform: "uppercase", fontSize: "0.7rem", fontWeight: 700 }}>
+                  {getTimelineCategoryLabel(selectedService.category)}
+                </span>
+                <h3 style={{ margin: 0, color: "var(--white)", fontSize: "1.15rem", fontWeight: 700 }}>
+                  {isEn ? "Service Details" : "Chi Tiết Dịch Vụ"}
+                </h3>
+              </div>
+              <button className="close-modal-btn" onClick={() => setSelectedService(null)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="modal-body" style={{ padding: "24px 30px", maxHeight: "75vh", overflowY: "auto" }}>
+              {selectedService.image && (
+                <div style={{ width: "100%", height: "220px", borderRadius: "12px", overflow: "hidden", marginBottom: "20px" }}>
+                  <img src={selectedService.image} alt={selectedService.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              )}
+
+              <h3 style={{ color: "var(--primary)", fontSize: "1.4rem", fontWeight: 800, marginBottom: "8px" }}>
+                {isEn ? (selectedService.name_en || selectedService.name) : selectedService.name}
+              </h3>
+
+              <p style={{ fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.6, marginBottom: "20px" }}>
+                {isEn ? (selectedService.desc_en || selectedService.desc) : selectedService.desc}
+              </p>
+
+              {/* Dynamic details section depending on category */}
+              <div style={{ background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.02)", marginBottom: "24px" }}>
+                <h4 style={{ color: "var(--primary)", fontSize: "0.9rem", fontWeight: 700, marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                  {isEn ? "Specifications & Amenities" : "Thông Tin Chi Tiết & Tiện Nghi"}
+                </h4>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "0.88rem" }}>
+                  {selectedService.category === "hotel" && (
+                    <>
+                      <div><strong>🔑 {isEn ? "Host:" : "Chủ nhà:"}</strong> {selectedService.host || (isEn ? "Verified Host" : "Chính chủ")}</div>
+                      <div><strong>⭐ {isEn ? "Rating:" : "Đánh giá:"}</strong> {selectedService.rating || "4.8"} / 5</div>
+                      <div><strong>📍 {isEn ? "Location:" : "Khu vực:"}</strong> {selectedService.address || "Phú Quốc"}</div>
+                      <div><strong>👥 {isEn ? "Capacity:" : "Sức chứa:"}</strong> {isEn ? `Max ${selectedService.maxGuests || 2} guests` : `Tối đa ${selectedService.maxGuests || 2} khách`}</div>
+                      <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
+                        <strong>✨ {isEn ? "Included Amenities:" : "Tiện nghi phòng:"}</strong> Wifi tốc độ cao, Điều hòa, Nước suối miễn phí, Dịch vụ dọn phòng hàng ngày.
+                      </div>
+                    </>
+                  )}
+
+                  {selectedService.category === "dining" && (
+                    <>
+                      <div style={{ gridColumn: "1 / -1" }}><strong>🍽️ {isEn ? "Sample Menu:" : "Thực đơn tiêu chuẩn:"}</strong> {selectedService.menu || (isEn ? "Fresh Seafood, Squid, hotpot" : "Hải sản tươi sống, ghẹ hấp sả, tôm nướng")}</div>
+                      <div><strong>📍 {isEn ? "Address:" : "Địa chỉ:"}</strong> {selectedService.address || "Phú Quốc"}</div>
+                      <div><strong>🕒 {isEn ? "Open Hours:" : "Giờ hoạt động:"}</strong> 10:00 - 22:00</div>
+                      <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
+                        <strong>✨ {isEn ? "Atmosphere:" : "Không gian:"}</strong> Nhà bè hải sản tự nhiên mát mẻ, phục vụ tại bàn, hải sản bắt sống trực tiếp từ lồng bè.
+                      </div>
+                    </>
+                  )}
+
+                  {selectedService.category === "activity" && (
+                    <>
+                      <div><strong>🕒 {isEn ? "Duration:" : "Thời lượng:"}</strong> {isEn ? "Approx. 4-8 hours" : "Khoảng 4 - 8 tiếng"}</div>
+                      <div><strong>🎒 {isEn ? "Preparation:" : "Chuẩn bị:"}</strong> {isEn ? "Swimwear, sunscreen" : "Đồ bơi, kem chống nắng"}</div>
+                      <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
+                        <strong>✨ {isEn ? "Highlights:" : "Trải nghiệm nổi bật:"}</strong> Có hướng dẫn viên đi kèm, hỗ trợ quay phim chụp ảnh Flycam miễn phí, bảo hiểm du lịch trọn gói.
+                      </div>
+                    </>
+                  )}
+
+                  {selectedService.category === "transport" && (
+                    <>
+                      <div><strong>🚗 {isEn ? "Type:" : "Loại xe:"}</strong> {selectedService.type || (isEn ? "Motorbike / Car" : "Xe máy / Ô tô")}</div>
+                      <div><strong>🏢 {isEn ? "Provider:" : "Nhà cung cấp:"}</strong> {selectedService.provider || "Phú Quốc Travel"}</div>
+                      <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
+                        <strong>✨ {isEn ? "Terms:" : "Điều khoản thuê xe:"}</strong> Đã bao gồm mũ bảo hiểm/bản đồ du lịch, giao nhận xe tận nơi tại khách sạn hoặc sân bay miễn phí.
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* YouTube video player inside modal if available */}
+              {selectedService.youtube && (
+                <div style={{ marginBottom: "24px" }}>
+                  <h4 style={{ color: "var(--primary)", fontSize: "0.9rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>
+                    🎥 {isEn ? "Tour / Accommodation Video" : "Video Thực Tế Trải Nghiệm"}
+                  </h4>
+                  <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: "12px" }}>
+                    <iframe
+                      src={selectedService.youtube.includes("watch?v=") 
+                        ? selectedService.youtube.replace("watch?v=", "embed/").split("&")[0] 
+                        : selectedService.youtube.includes("youtu.be/") 
+                          ? selectedService.youtube.replace("youtu.be/", "youtube.com/embed/") 
+                          : selectedService.youtube}
+                      title="YouTube player"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Modal Footer Actions */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: "20px", marginTop: "10px" }}>
+                <div>
+                  <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "block" }}>{isEn ? "Price per person/night:" : "Đơn giá dịch vụ:"}</span>
+                  <strong style={{ fontSize: "1.4rem", color: "var(--secondary)", fontWeight: 800 }}>{formatPrice(selectedService.price)} đ</strong>
+                </div>
+                <div style={{ display: "flex", gap: "10px" }}>
+                  <button className="btn btn-outline" onClick={() => setSelectedService(null)} style={{ padding: "10px 20px" }}>
+                    {isEn ? "Close" : "Đóng lại"}
+                  </button>
+                  <button 
+                    className="btn btn-primary" 
+                    onClick={() => { addItemToTimeline(selectedService); setSelectedService(null); }}
+                    style={{ display: "flex", gap: "6px", padding: "10px 24px" }}
+                  >
+                    <Plus size={16} />
+                    {isEn ? "Add to Itinerary" : "Chọn Dịch Vụ"}
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
