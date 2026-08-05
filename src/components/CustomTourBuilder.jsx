@@ -10,6 +10,11 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
   const [activeImageIdx, setActiveImageIdx] = useState(0);
   const t = translations[language || "vi"];
   const isEn = language === "en";
+  const l = (vi, en, hi) => {
+    if (language === "vi") return vi;
+    if (language === "en") return en;
+    return hi || en;
+  };
 
   const addItemToTimeline = (item) => {
     const newItem = {
@@ -240,18 +245,20 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                   {t.builder_timeline_title}
                 </h3>
                 <span className="timeline-horizontal-badge">
-                  {timeline.length} {isEn ? "selected services" : "dịch vụ đã chọn"}
+                  {timeline.length} {l("dịch vụ đã chọn", "selected services", "चयनित सेवाएं")}
                 </span>
               </div>
 
               {timeline.length === 0 ? (
                 <div className="timeline-horizontal-empty">
                   <AlertCircle size={32} style={{ color: "var(--text-muted)", opacity: 0.5, marginBottom: "8px" }} />
-                  <p style={{ fontSize: "0.88rem", fontWeight: 600 }}>{isEn ? "Your custom timeline is empty." : "Hành trình tự thiết kế đang trống."}</p>
+                  <p style={{ fontSize: "0.88rem", fontWeight: 600 }}>{l("Hành trình tự thiết kế đang trống.", "Your custom timeline is empty.", "आपका कस्टम समयरेखा खाली है।")}</p>
                   <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
-                    {isEn 
-                      ? "Select services above by clicking (+) to build your package." 
-                      : "Vui lòng click chọn dấu (+) ở các dịch vụ bên trên để thiết kế gói dịch vụ."}
+                    {l(
+                      "Vui lòng click chọn dấu (+) ở các dịch vụ bên trên để thiết kế gói dịch vụ.",
+                      "Select services above by clicking (+) to build your package.",
+                      "अपने पैकेज बनाने के लिए ऊपर से सेवाएं जोड़ने के लिए (+) पर क्लिक करें。"
+                    )}
                   </p>
                 </div>
               ) : (
@@ -370,7 +377,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                         zIndex: 10,
                         backdropFilter: "blur(4px)"
                       }}
-                      title={isEn ? "Previous Image" : "Hình trước"}
+                      title={l("Hình trước", "Previous Image", "पिछला चित्र")}
                       className="gallery-nav-overlay-btn"
                     >
                       <ChevronLeft size={20} />
@@ -399,7 +406,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                         zIndex: 10,
                         backdropFilter: "blur(4px)"
                       }}
-                      title={isEn ? "Next Image" : "Hình tiếp theo"}
+                      title={l("Hình tiếp theo", "Next Image", "अगला चित्र")}
                       className="gallery-nav-overlay-btn"
                     >
                       <ChevronRight size={20} />
@@ -440,59 +447,59 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
               )}
 
               <h3 style={{ color: "var(--primary)", fontSize: "1.4rem", fontWeight: 800, marginBottom: "8px" }}>
-                {isEn ? (selectedService.name_en || selectedService.name) : selectedService.name}
+                {language === "vi" ? selectedService.name : (selectedService.name_en || selectedService.name)}
               </h3>
 
               <p style={{ fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.6, marginBottom: "20px" }}>
-                {isEn ? (selectedService.desc_en || selectedService.desc) : selectedService.desc}
+                {language === "vi" ? selectedService.desc : (selectedService.desc_en || selectedService.desc)}
               </p>
 
               {/* Dynamic details section depending on category */}
               <div style={{ background: "#f8fafc", padding: "16px 20px", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.02)", marginBottom: "24px" }}>
                 <h4 style={{ color: "var(--primary)", fontSize: "0.9rem", fontWeight: 700, marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  {isEn ? "Specifications & Amenities" : "Thông Tin Chi Tiết & Tiện Nghi"}
+                  {l("Thông Tin Chi Tiết & Tiện Nghi", "Specifications & Amenities", "विवरण और सुविधाएं")}
                 </h4>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", fontSize: "0.88rem" }}>
                   {selectedService.category === "hotel" && (
                     <>
-                      <div><strong>🔑 {isEn ? "Host:" : "Chủ nhà:"}</strong> {selectedService.host || (isEn ? "Verified Host" : "Chính chủ")}</div>
-                      <div><strong>⭐ {isEn ? "Rating:" : "Đánh giá:"}</strong> {selectedService.rating || "4.8"} / 5</div>
-                      <div><strong>📍 {isEn ? "Location:" : "Khu vực:"}</strong> {selectedService.address || "Phú Quốc"}</div>
-                      <div><strong>👥 {isEn ? "Capacity:" : "Sức chứa:"}</strong> {isEn ? `Max ${selectedService.maxGuests || 2} guests` : `Tối đa ${selectedService.maxGuests || 2} khách`}</div>
+                      <div><strong>🔑 {l("Chủ nhà:", "Host:", "मेजबान:")}</strong> {selectedService.host || l("Chính chủ", "Verified Host", "सत्यापित मेजबान")}</div>
+                      <div><strong>⭐ {l("Đánh giá:", "Rating:", "मूल्यांकन:")}</strong> {selectedService.rating || "4.8"} / 5</div>
+                      <div><strong>📍 {l("Khu vực:", "Location:", "स्थान:")}</strong> {selectedService.address || "Phú Quốc"}</div>
+                      <div><strong>👥 {l("Sức chứa:", "Capacity:", "अतिथि:")}</strong> {l(`Tối đa ${selectedService.maxGuests || 2} khách`, `Max ${selectedService.maxGuests || 2} guests`, `अधिकतम ${selectedService.maxGuests || 2} अतिथि`)}</div>
                       <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
-                        <strong>✨ {isEn ? "Included Amenities:" : "Tiện nghi phòng:"}</strong> Wifi tốc độ cao, Điều hòa, Nước suối miễn phí, Dịch vụ dọn phòng hàng ngày.
+                        <strong>✨ {l("Tiện nghi phòng:", "Included Amenities:", "शामिल सुविधाएं:")}</strong> Wifi tốc độ cao, Điều hòa, Nước suối miễn phí, Dịch vụ dọn phòng hàng ngày.
                       </div>
                     </>
                   )}
 
                   {selectedService.category === "dining" && (
                     <>
-                      <div style={{ gridColumn: "1 / -1" }}><strong>🍽️ {isEn ? "Sample Menu:" : "Thực đơn tiêu chuẩn:"}</strong> {selectedService.menu || (isEn ? "Fresh Seafood, Squid, hotpot" : "Hải sản tươi sống, ghẹ hấp sả, tôm nướng")}</div>
-                      <div><strong>📍 {isEn ? "Address:" : "Địa chỉ:"}</strong> {selectedService.address || "Phú Quốc"}</div>
-                      <div><strong>🕒 {isEn ? "Open Hours:" : "Giờ hoạt động:"}</strong> 10:00 - 22:00</div>
+                      <div style={{ gridColumn: "1 / -1" }}><strong>🍽️ {l("Thực đơn tiêu chuẩn:", "Sample Menu:", "मानक मेनू:")}</strong> {selectedService.menu || l("Hải sản tươi sống, ghẹ hấp sả, tôm nướng", "Fresh Seafood, Squid, hotpot", "ताजा समुद्री भोजन, स्क्विड, हॉटपॉट")}</div>
+                      <div><strong>📍 {l("Địa chỉ:", "Address:", "पता:")}</strong> {selectedService.address || "Phú Quốc"}</div>
+                      <div><strong>🕒 {l("Giờ hoạt động:", "Open Hours:", "खुलने का समय:")}</strong> 10:00 - 22:00</div>
                       <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
-                        <strong>✨ {isEn ? "Atmosphere:" : "Không gian:"}</strong> Nhà bè hải sản tự nhiên mát mẻ, phục vụ tại bàn, hải sản bắt sống trực tiếp từ lồng bè.
+                        <strong>✨ {l("Không gian:", "Atmosphere:", "वातावरण:")}</strong> {l("Nhà bè hải sản tự nhiên mát mẻ, phục vụ tại bàn, hải sản bắt sống trực tiếp từ lồng bè.", "Fresh seafood floating raft, tableside service, seafood caught live.", "ताजा समुद्री भोजन फ्लोटिंग राफ्ट, टेबलसाइड सेवा, जीवित पकड़ी गई समुद्री भोजन।")}
                       </div>
                     </>
                   )}
 
                   {selectedService.category === "activity" && (
                     <>
-                      <div><strong>🕒 {isEn ? "Duration:" : "Thời lượng:"}</strong> {isEn ? "Approx. 4-8 hours" : "Khoảng 4 - 8 tiếng"}</div>
-                      <div><strong>🎒 {isEn ? "Preparation:" : "Chuẩn bị:"}</strong> {isEn ? "Swimwear, sunscreen" : "Đồ bơi, kem chống nắng"}</div>
+                      <div><strong>🕒 {l("Thời lượng:", "Duration:", "अवधि:")}</strong> {l("Khoảng 4 - 8 tiếng", "Approx. 4-8 hours", "लगभग 4-8 घंटे")}</div>
+                      <div><strong>🎒 {l("Chuẩn bị:", "Preparation:", "तैयारी:")}</strong> {l("Đồ bơi, kem chống nắng", "Swimwear, sunscreen", "तैरने की पोशाक, सनस्क्रीन")}</div>
                       <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
-                        <strong>✨ {isEn ? "Highlights:" : "Trải nghiệm nổi bật:"}</strong> Có hướng dẫn viên đi kèm, hỗ trợ quay phim chụp ảnh Flycam miễn phí, bảo hiểm du lịch trọn gói.
+                        <strong>✨ {l("Trải nghiệm nổi bật:", "Highlights:", "प्रमुख विशेषताएं:")}</strong> {l("Có hướng dẫn viên đi kèm, hỗ trợ quay phim chụp ảnh Flycam miễn phí, bảo hiểm du lịch trọn gói.", "English guide, flycam photography, tour insurance.", "गाइड शामिल, मुफ्त फ्लाईकैम फोटो/वीडियो, यात्रा बीमा।")}
                       </div>
                     </>
                   )}
 
                   {selectedService.category === "transport" && (
                     <>
-                      <div><strong>🚗 {isEn ? "Type:" : "Loại xe:"}</strong> {selectedService.type || (isEn ? "Motorbike / Car" : "Xe máy / Ô tô")}</div>
-                      <div><strong>🏢 {isEn ? "Provider:" : "Nhà cung cấp:"}</strong> {selectedService.provider || "Phú Quốc Travel"}</div>
+                      <div><strong>🚗 {l("Loại xe:", "Type:", "वाहन प्रकार:")}</strong> {selectedService.type || l("Xe máy / Ô tô", "Motorbike / Car", "मोटरबाइक / कार")}</div>
+                      <div><strong>🏢 {l("Nhà cung cấp:", "Provider:", "प्रदाता:")}</strong> {selectedService.provider || "Phú Quốc Travel"}</div>
                       <div style={{ gridColumn: "1 / -1", marginTop: "4px" }}>
-                        <strong>✨ {isEn ? "Terms:" : "Điều khoản thuê xe:"}</strong> Đã bao gồm mũ bảo hiểm/bản đồ du lịch, giao nhận xe tận nơi tại khách sạn hoặc sân bay miễn phí.
+                        <strong>✨ {l("Điều khoản thuê xe:", "Terms:", "किराए की शर्तें:")}</strong> {l("Đã bao gồm mũ bảo hiểm/bản đồ du lịch, giao nhận xe tận nơi tại khách sạn hoặc sân bay miễn phí.", "Helmet and map included, free pick up.", "हेलमेट और नक्शा शामिल, मुफ्त पिकअप और ड्रॉप।")}
                       </div>
                     </>
                   )}
@@ -503,7 +510,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
               {selectedService.youtube && (
                 <div style={{ marginBottom: "24px" }}>
                   <h4 style={{ color: "var(--primary)", fontSize: "0.9rem", fontWeight: 700, marginBottom: "10px", textTransform: "uppercase" }}>
-                    🎥 {isEn ? "Tour / Accommodation Video" : "Video Thực Tế Trải Nghiệm"}
+                    🎥 {l("Video Thực Tế Trải Nghiệm", "Tour / Accommodation Video", "टूर / आवास वीडियो")}
                   </h4>
                   <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: "12px" }}>
                     <iframe
@@ -525,12 +532,12 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
               {/* Modal Footer Actions */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: "20px", marginTop: "10px" }}>
                 <div>
-                  <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "block" }}>{isEn ? "Price per person/night:" : "Đơn giá dịch vụ:"}</span>
+                  <span style={{ fontSize: "0.78rem", color: "var(--text-muted)", display: "block" }}>{l("Đơn giá dịch vụ:", "Price per person/night:", "सेवा मूल्य:")}</span>
                   <strong style={{ fontSize: "1.4rem", color: "var(--secondary)", fontWeight: 800 }}>{formatPrice(selectedService.price)} đ</strong>
                 </div>
                 <div style={{ display: "flex", gap: "10px" }}>
                   <button className="btn btn-outline" onClick={() => setSelectedService(null)} style={{ padding: "10px 20px" }}>
-                    {isEn ? "Close" : "Đóng lại"}
+                    {l("Đóng lại", "Close", "बंद करें")}
                   </button>
                   <button 
                     className="btn btn-primary" 
@@ -538,7 +545,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                     style={{ display: "flex", gap: "6px", padding: "10px 24px" }}
                   >
                     <Plus size={16} />
-                    {isEn ? "Add to Itinerary" : "Chọn Dịch Vụ"}
+                    {l("Chọn Dịch Vụ", "Add to Itinerary", "सेवा का चयन करें")}
                   </button>
                 </div>
               </div>

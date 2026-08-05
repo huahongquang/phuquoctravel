@@ -25,6 +25,11 @@ export default function App() {
   const [language, setLanguage] = useState(() => localStorage.getItem("pq_lang") || "vi");
   const t = translations[language];
   const isEn = language === "en";
+  const l = (vi, en, hi) => {
+    if (language === "vi") return vi;
+    if (language === "en") return en;
+    return hi || en;
+  };
 
   // Dynamic database states loaded from mock backend API
   const [builderDatabase, setBuilderDatabase] = useState(() => apiService.getDbServices());
@@ -81,7 +86,7 @@ export default function App() {
 
   // Language toggle handler
   const handleLanguageToggle = () => {
-    const newLang = language === "vi" ? "en" : "vi";
+    const newLang = language === "vi" ? "en" : language === "en" ? "hi" : "vi";
     setLanguage(newLang);
     localStorage.setItem("pq_lang", newLang);
   };
@@ -412,7 +417,7 @@ export default function App() {
                 <input 
                   type="text" 
                   required 
-                  placeholder={isEn ? "Enter username" : "Nhập tên tài khoản"} 
+                  placeholder={l("Nhập tên tài khoản", "Enter username", "उपयोगकर्ता नाम दर्ज करें")} 
                   value={loginUsername} 
                   onChange={(e) => setLoginUsername(e.target.value)} 
                   style={{ width: "100%" }}
@@ -424,7 +429,7 @@ export default function App() {
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required 
-                  placeholder={isEn ? "Enter password" : "Nhập mật khẩu"} 
+                  placeholder={l("Nhập mật khẩu", "Enter password", "पासवर्ड दर्ज करें")} 
                   value={loginPassword} 
                   onChange={(e) => setLoginPassword(e.target.value)} 
                   style={{ width: "100%", paddingRight: "40px" }}

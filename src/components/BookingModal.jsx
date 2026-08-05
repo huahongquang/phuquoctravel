@@ -15,6 +15,11 @@ export default function BookingModal({
 }) {
   const t = translations[language || "vi"];
   const isEn = language === "en";
+  const l = (vi, en, hi) => {
+    if (language === "vi") return vi;
+    if (language === "en") return en;
+    return hi || en;
+  };
 
   // Add to cart form state
   const [date, setDate] = useState("");
@@ -51,7 +56,7 @@ export default function BookingModal({
     
     const cartItem = {
       tourId: tour.id,
-      tourName: isEn ? (tour.name_en || tour.name) : tour.name,
+      tourName: language === "vi" ? tour.name : (tour.name_en || tour.name),
       price: tour.price,
       date,
       adults,
@@ -98,7 +103,7 @@ export default function BookingModal({
                   {t.modal_title_add}
                 </h3>
                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                  {isEn ? (tour.name_en || tour.name) : tour.name}
+                  {language === "vi" ? tour.name : (tour.name_en || tour.name)}
                 </span>
               </div>
             </div>
@@ -157,7 +162,7 @@ export default function BookingModal({
                   {t.modal_title_checkout}
                 </h3>
                 <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                  {cartItems.length} {isEn ? "selected services" : "dịch vụ đã chọn"}
+                  {cartItems.length} {l("dịch vụ đã chọn", "selected services", "चयनित सेवाएं")}
                 </span>
               </div>
             </div>
@@ -167,7 +172,7 @@ export default function BookingModal({
                 {/* Cart summary list */}
                 <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "12px", border: "1px solid rgba(0,0,0,0.02)", marginBottom: "20px" }}>
                   <strong style={{ color: "var(--primary)", fontSize: "0.8rem", display: "block", marginBottom: "8px", textTransform: "uppercase" }}>
-                    {isEn ? "Selected Itineraries Summary" : "Tóm tắt hành trình đã chọn"}
+                    {l("Tóm tắt hành trình đã chọn", "Selected Itineraries Summary", "चयनित यात्रा कार्यक्रम का सारांश")}
                   </strong>
                   <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
                     {cartItems.map((item, idx) => (
@@ -181,7 +186,7 @@ export default function BookingModal({
 
                 <div className="form-group">
                   <label>{t.form_fullname}</label>
-                  <input type="text" required placeholder={isEn ? "Your full name" : "Nhập họ và tên của bạn"} value={fullName} onChange={(e) => setFullName(e.target.value)} />
+                  <input type="text" required placeholder={l("Nhập họ và tên của bạn", "Your full name", "अपना पूरा नाम दर्ज करें")} value={fullName} onChange={(e) => setFullName(e.target.value)} />
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginTop: "12px" }}>
@@ -221,7 +226,7 @@ export default function BookingModal({
                   {t.modal_title_receipt}
                 </h3>
                 <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>
-                  {isEn ? "E-Ticket confirmation pass" : "Biên lai mã vé điện tử"}
+                  {l("Biên lai mã vé điện tử", "E-Ticket confirmation pass", "ई-टिकट रसीद")}
                 </span>
               </div>
             </div>
@@ -263,16 +268,16 @@ export default function BookingModal({
                     <div style={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
                       <div>
                         <span className="tour-name" style={{ fontWeight: 600, color: "var(--primary)" }}>{item.tourName}</span>
-                        {!item.isCustom && <span className="tour-qty" style={{ color: "var(--text-muted)", marginLeft: "6px" }}>({item.adults} {isEn ? "Ad" : "NL"}, {item.children} {isEn ? "Ch" : "TE"})</span>}
+                        {!item.isCustom && <span className="tour-qty" style={{ color: "var(--text-muted)", marginLeft: "6px" }}>({item.adults} {l("NL", "Ad", "वयस्क")}, {item.children} {l("TE", "Ch", "बच्चे")})</span>}
                         <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px" }}>
-                          {item.isCustom ? (isEn ? "Personalized custom itinerary" : "Hành trình cá nhân hóa tự chọn") : `${isEn ? "Departure" : "Khởi hành"}: ${new Date(item.date).toLocaleDateString("vi-VN")}`}
+                          {item.isCustom ? l("Hành trình cá nhân hóa tự chọn", "Personalized custom itinerary", "व्यक्तिगत कस्टम यात्रा कार्यक्रम") : `${l("Khởi hành", "Departure", "प्रस्थान")}: ${new Date(item.date).toLocaleDateString("vi-VN")}`}
                         </div>
                       </div>
                       <span className="tour-price" style={{ fontWeight: 600 }}>{formatPrice(item.totalPrice)} đ</span>
                     </div>
                     {item.isCustom && item.customItems && (
                       <div style={{ background: "#f8fafc", padding: "10px 14px", borderRadius: "10px", marginTop: "8px", width: "100%", fontSize: "0.75rem", border: "1px solid rgba(13, 44, 84, 0.04)" }}>
-                        <strong style={{ color: "var(--primary)", display: "block", marginBottom: "6px" }}>{isEn ? "Custom details:" : "Lịch trình chi tiết:"}</strong>
+                        <strong style={{ color: "var(--primary)", display: "block", marginBottom: "6px" }}>{l("Lịch trình chi tiết:", "Custom details:", "कस्टम विवरण:")}</strong>
                         <ul style={{ paddingLeft: "12px", listStyleType: "circle", color: "var(--text-muted)", display: "flex", flexDirection: "column", gap: "4px" }}>
                           {item.customItems.map((cItem, cIdx) => (
                             <li key={cIdx} style={{ display: "flex", justifyContent: "space-between" }}>
@@ -288,7 +293,7 @@ export default function BookingModal({
               </div>
 
               <div className="receipt-total-row" style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid var(--primary)", paddingTop: "16px", marginTop: "20px" }}>
-                <span style={{ fontWeight: 600, color: "var(--primary)" }}>{isEn ? "Total Amount Paid" : "Tổng cộng đã thanh toán"}</span>
+                <span style={{ fontWeight: 600, color: "var(--primary)" }}>{l("Tổng cộng đã thanh toán", "Total Amount Paid", "कुल भुगतान किया गया")}</span>
                 <span className="total-amount" style={{ fontSize: "1.3rem", color: "var(--secondary)", fontWeight: 800 }}>{formatPrice(bookingDetails.totalAmount)} VNĐ</span>
               </div>
 

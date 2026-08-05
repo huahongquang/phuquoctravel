@@ -95,7 +95,7 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
             onClick={onLanguageToggle}
             style={{ padding: "6px 12px", fontSize: "0.8rem", fontWeight: "bold", border: "1px solid rgba(13, 44, 84, 0.15)", background: "#f8fafc", color: "var(--primary)", display: "flex", alignItems: "center", gap: "4px" }}
           >
-            🌐 {language === "vi" ? "EN" : "VI"}
+            🌐 {language === "vi" ? "VI" : language === "en" ? "EN" : "HI"}
           </button>
 
           <button 
@@ -159,7 +159,7 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
               onClick={() => { onLanguageToggle(); setMobileMenuOpen(false); }}
               style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px" }}
             >
-              🌐 {language === "vi" ? "Switch to English" : "Chuyển sang Tiếng Việt"}
+              🌐 {language === "vi" ? "Tiếng Việt (Chuyển sang EN)" : language === "en" ? "English (Switch to HI)" : "हिन्दी (Switch to VI)"}
             </button>
 
             {userSession.role === "guest" ? (
