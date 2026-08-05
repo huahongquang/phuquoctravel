@@ -50,7 +50,28 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
           <span>PHÚ QUỐC</span> TRAVEL
         </a>
 
-        {/* Desktop Links */}
+        {/* Mobile Header Actions (Visible on Mobile only) */}
+        <div className="mobile-header-actions">
+          <button 
+            className="cart-icon-btn" 
+            onClick={onCartClick}
+            aria-label="Giỏ hàng tour"
+            style={{ width: "36px", height: "36px" }}
+          >
+            <ShoppingCart size={18} />
+            {cartCount > 0 && <span className="cart-badge" style={{ width: "16px", height: "16px", fontSize: "0.6rem" }}>{cartCount}</span>}
+          </button>
+          
+          <button 
+            className="mobile-menu-btn" 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Menu"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+
+        {/* Desktop Links (Hidden on Mobile) */}
         <div className="nav-links">
           {navItems.map((item) => (
             <a
@@ -67,9 +88,8 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
           ))}
         </div>
 
-        {/* Desktop Actions */}
+        {/* Desktop Actions (Hidden on Mobile) */}
         <div className="nav-actions">
-          {/* Language Toggle Button */}
           <button 
             className="btn btn-outline"
             onClick={onLanguageToggle}
@@ -113,6 +133,60 @@ export default function Navbar({ cartCount, onCartClick, activeSection, setActiv
           )}
         </div>
       </div>
+
+      {/* Mobile Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu-drawer animate-fade-in">
+          <div className="mobile-drawer-links">
+            {navItems.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                className={`mobile-drawer-link ${activeSection === item.id ? "active" : ""}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(item.id);
+                }}
+              >
+                {item.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="mobile-drawer-actions">
+            <button 
+              className="btn btn-outline" 
+              onClick={() => { onLanguageToggle(); setMobileMenuOpen(false); }}
+              style={{ width: "100%", justifyContent: "center", display: "flex", gap: "8px" }}
+            >
+              🌐 {language === "vi" ? "Switch to English" : "Chuyển sang Tiếng Việt"}
+            </button>
+
+            {userSession.role === "guest" ? (
+              <button 
+                className="btn btn-primary" 
+                onClick={() => { onLoginClick(); setMobileMenuOpen(false); }}
+                style={{ width: "100%", justifyContent: "center" }}
+              >
+                <Shield size={16} /> {t.nav_login}
+              </button>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px", width: "100%" }}>
+                <span style={{ textAlign: "center", fontSize: "0.85rem", background: "rgba(0,168,150,0.08)", padding: "10px", borderRadius: "10px", color: "var(--secondary)", fontWeight: 700 }}>
+                  {userSession.role === "admin" ? "🔑 Admin Account" : `👤 Guide: ${userSession.details.name}`}
+                </span>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={() => { onLogout(); setMobileMenuOpen(false); }}
+                  style={{ width: "100%", justifyContent: "center" }}
+                >
+                  {t.nav_logout}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

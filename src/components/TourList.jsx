@@ -26,7 +26,7 @@ export default function TourList({ onBookClick, onDetailClick, tours, language }
         <p className="section-subtitle">{t.tours_subtitle}</p>
 
         {/* Filter Tabs */}
-        <div className="filter-tabs">
+        <div className="filter-bar">
           {filterItems.map((tab) => (
             <button
               key={tab.id}

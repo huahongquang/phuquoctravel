@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Plane, Ship, Hotel, Utensils, Compass, Plus, Trash2, ArrowUp, ArrowDown, ShoppingBag, Sparkles, AlertCircle } from "lucide-react";
+import { Plane, Ship, Hotel, Utensils, Compass, Plus, Trash2, ArrowUp, ArrowDown, ShoppingBag, Sparkles, AlertCircle, X } from "lucide-react";
 import { translations } from "../data/translations";
 
 export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatabase, language }) {
@@ -8,28 +8,6 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
   const [showMediaId, setShowMediaId] = useState(null);
   const t = translations[language || "vi"];
   const isEn = language === "en";
-
-  // Drag and drop HTML5 setup
-  const handleDragStart = (e, item) => {
-    e.dataTransfer.setData("application/json", JSON.stringify(item));
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault(); // Required to allow drop
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    try {
-      const dataStr = e.dataTransfer.getData("application/json");
-      if (dataStr) {
-        const item = JSON.parse(dataStr);
-        addItemToTimeline(item);
-      }
-    } catch (err) {
-      console.error("Drop error", err);
-    }
-  };
 
   const addItemToTimeline = (item) => {
     const newItem = {
@@ -120,13 +98,13 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
 
   return (
     <section id="builder" className="builder-section">
-      <div className="container">
+      <div className="container animate-fade-in-up">
         <h2 className="section-title">{t.builder_title}</h2>
         <p className="section-subtitle">{t.builder_subtitle}</p>
 
-        <div className="builder-container">
-          {/* Left Side: Services Bank */}
-          <div className="builder-bank">
+        <div className="builder-container" style={{ gridTemplateColumns: "1fr" }}>
+          {/* Expanded Services Bank */}
+          <div className="builder-bank" style={{ width: "100%" }}>
             <div className="bank-tabs">
               {categoryTabs.map((tab) => (
                 <button
@@ -143,7 +121,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
               {t.builder_tip}
             </p>
 
-            <div className="bank-items-grid">
+            <div className="bank-items-grid" style={{ maxHeight: "none", overflowY: "visible" }}>
               {servicesDatabase[activeCategory]?.map((item) => {
                 const displayName = isEn ? (item.name_en || item.name) : item.name;
                 const displayDesc = isEn ? (item.desc_en || item.desc) : item.desc;
@@ -151,15 +129,10 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                   <div
                     key={item.id}
                     className="bank-item-card"
-                    draggable
-                    onDragStart={(e) => handleDragStart(e, item)}
-                    style={{ cursor: "grab" }}
                   >
                     <div>
                       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
                         <span style={{ background: "rgba(0,168,150,0.08)", padding: "6px", borderRadius: "8px", color: "var(--secondary)" }}>
-                          {activeCategory === "flight" && <Plane size={18} />}
-                          {activeCategory === "transport" && <Ship size={18} />}
                           {activeCategory === "hotel" && <Hotel size={18} />}
                           {activeCategory === "dining" && <Utensils size={18} />}
                           {activeCategory === "activity" && <Compass size={18} />}
@@ -201,13 +174,13 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                       {showMediaId === item.id && (
                         <div style={{ marginTop: "12px", borderTop: "1px dashed rgba(0,0,0,0.08)", paddingTop: "10px" }}>
                           {item.image && (
-                            <div style={{ borderRadius: "8px", overflow: "hidden", marginBottom: "8px", maxHeight: "110px" }}>
-                              <img src={item.image} alt={displayName} style={{ width: "100%", height: "100px", objectFit: "cover" }} />
+                            <div style={{ borderRadius: "8px", overflow: "hidden", marginBottom: "8px", maxHeight: "150px" }}>
+                              <img src={item.image} alt={displayName} style={{ width: "100%", height: "140px", objectFit: "cover" }} />
                             </div>
                           )}
                           {item.video && (
                             <div style={{ borderRadius: "8px", overflow: "hidden", marginBottom: "8px" }}>
-                              <video src={item.video} controls style={{ width: "100%", maxHeight: "100px", background: "#000" }} />
+                              <video src={item.video} controls style={{ width: "100%", maxHeight: "140px", background: "#000" }} />
                             </div>
                           )}
                           {item.youtube && (
@@ -230,7 +203,7 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                       )}
                     </div>
 
-                    <div className="bank-item-footer" style={{ borderTop: "1px solid rgba(0,0,0,0.04)", paddingTop: "10px", marginTop: "10px" }}>
+                    <div className="bank-item-footer">
                       <span className="bank-item-price">{formatPrice(item.price)} đ</span>
                       <button
                         type="button"
@@ -239,109 +212,106 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                           background: "var(--primary)",
                           color: "var(--white)",
                           border: "none",
-                          width: "28px",
-                          height: "28px",
+                          width: "36px",
+                          height: "36px",
                           borderRadius: "50%",
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          cursor: "pointer"
+                          cursor: "pointer",
+                          transition: "var(--transition)"
                         }}
                         title={t.btn_add_timeline}
                       >
-                        <Plus size={16} />
+                        <Plus size={18} />
                       </button>
                     </div>
                   </div>
                 );
               })}
             </div>
-          </div>
 
-          {/* Right Side: Timeline / Custom Itinerary */}
-          <div
-            className="builder-timeline"
-            onDragOver={handleDragOver}
-            onDrop={handleDrop}
-          >
-            <div className="timeline-header">
-              <h3 style={{ fontSize: "1.15rem", display: "flex", alignItems: "center", gap: "8px" }}>
-                <Sparkles size={18} style={{ color: "var(--accent)" }} />
-                {t.builder_timeline_title}
-              </h3>
-              <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
-                {timeline.length} {isEn ? "selected items" : "dịch vụ đã chọn"}
-              </span>
-            </div>
-
-            {timeline.length === 0 ? (
-              <div className="builder-empty-state">
-                <AlertCircle size={44} style={{ color: "var(--text-muted)", opacity: 0.5 }} />
-                <p style={{ fontSize: "0.9rem" }}>{isEn ? "Timeline is empty." : "Lịch trình trống."}</p>
-                <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
-                  {isEn 
-                    ? "Drag and drop services from the left pane or click (+) to start." 
-                    : "Hãy kéo thả các dịch vụ từ cột bên trái hoặc nhấn nút (+) để bắt đầu thiết kế."}
-                </p>
+            {/* Horizontal Timeline Summary (Phần Timeline tích hợp ở dưới phần mở rộng) */}
+            <div className="builder-timeline-horizontal">
+              <div className="timeline-horizontal-header">
+                <h3 style={{ fontSize: "1.2rem", display: "flex", alignItems: "center", gap: "8px", color: "var(--primary)" }}>
+                  <Sparkles size={20} style={{ color: "var(--accent)" }} />
+                  {t.builder_timeline_title}
+                </h3>
+                <span className="timeline-horizontal-badge">
+                  {timeline.length} {isEn ? "selected services" : "dịch vụ đã chọn"}
+                </span>
               </div>
-            ) : (
-              <div className="timeline-list">
-                {timeline.map((item, idx) => (
-                  <div key={item.uniqueId} className="timeline-item">
-                    <div className="timeline-item-info">
-                      <span className="timeline-item-category">
-                        {getTimelineCategoryLabel(item.category)}
-                      </span>
-                      <h4 className="timeline-item-title">{isEn ? (item.name_en || item.name) : item.name}</h4>
-                      <span className="timeline-item-price">{formatPrice(item.price)} đ</span>
-                    </div>
 
-                    <div className="timeline-item-actions">
-                      <button
-                        type="button"
-                        className="timeline-action-btn"
-                        onClick={() => moveItemUp(idx)}
-                        disabled={idx === 0}
-                        style={{ opacity: idx === 0 ? 0.3 : 1 }}
-                      >
-                        <ArrowUp size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        className="timeline-action-btn"
-                        onClick={() => moveItemDown(idx)}
-                        disabled={idx === timeline.length - 1}
-                        style={{ opacity: idx === timeline.length - 1 ? 0.3 : 1 }}
-                      >
-                        <ArrowDown size={14} />
-                      </button>
-                      <button
-                        type="button"
-                        className="timeline-action-btn delete"
-                        onClick={() => removeItem(item.uniqueId)}
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {timeline.length > 0 && (
-              <div className="builder-footer">
-                <div>
-                  <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>{t.builder_total_cost}</span>
-                  <strong style={{ fontSize: "1.4rem", color: "var(--secondary)", fontWeight: 800 }}>
-                    {formatPrice(totalCost)} đ
-                  </strong>
+              {timeline.length === 0 ? (
+                <div className="timeline-horizontal-empty">
+                  <AlertCircle size={32} style={{ color: "var(--text-muted)", opacity: 0.5, marginBottom: "8px" }} />
+                  <p style={{ fontSize: "0.88rem", fontWeight: 600 }}>{isEn ? "Your custom timeline is empty." : "Hành trình tự thiết kế đang trống."}</p>
+                  <p style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>
+                    {isEn 
+                      ? "Select services above by clicking (+) to build your package." 
+                      : "Vui lòng click chọn dấu (+) ở các dịch vụ bên trên để thiết kế gói dịch vụ."}
+                  </p>
                 </div>
-                <button className="btn btn-accent" onClick={handleCheckout} style={{ display: "flex", gap: "6px" }}>
-                  <ShoppingBag size={18} />
-                  {t.builder_btn_book}
-                </button>
-              </div>
-            )}
+              ) : (
+                <div className="timeline-horizontal-wrapper">
+                  <div className="timeline-horizontal-list">
+                    {timeline.map((item, idx) => (
+                      <div key={item.uniqueId} className="timeline-horizontal-card animate-fade-in">
+                        <div className="timeline-card-header">
+                          <span className="timeline-card-category">{getTimelineCategoryLabel(item.category)}</span>
+                          <button
+                            type="button"
+                            className="timeline-card-remove"
+                            onClick={() => removeItem(item.uniqueId)}
+                            title="Xóa"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                        <h4 className="timeline-card-title">{isEn ? (item.name_en || item.name) : item.name}</h4>
+                        <div className="timeline-card-footer">
+                          <span className="timeline-card-price">{formatPrice(item.price)} đ</span>
+                          <div className="timeline-card-nav">
+                            <button
+                              type="button"
+                              className="timeline-nav-btn"
+                              onClick={() => moveItemUp(idx)}
+                              disabled={idx === 0}
+                              style={{ opacity: idx === 0 ? 0.3 : 1 }}
+                            >
+                              <ArrowUp size={12} />
+                            </button>
+                            <button
+                              type="button"
+                              className="timeline-nav-btn"
+                              onClick={() => moveItemDown(idx)}
+                              disabled={idx === timeline.length - 1}
+                              style={{ opacity: idx === timeline.length - 1 ? 0.3 : 1 }}
+                            >
+                              <ArrowDown size={12} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="timeline-horizontal-checkout">
+                    <div className="checkout-cost-box">
+                      <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>{t.builder_total_cost}</span>
+                      <strong style={{ fontSize: "1.5rem", color: "var(--secondary)", fontWeight: 800 }}>
+                        {formatPrice(totalCost)} đ
+                      </strong>
+                    </div>
+                    <button className="btn btn-accent checkout-book-btn" onClick={handleCheckout}>
+                      <ShoppingBag size={20} />
+                      {t.builder_btn_book}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
