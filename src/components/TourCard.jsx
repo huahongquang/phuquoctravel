@@ -10,21 +10,31 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
     return new Intl.NumberFormat("vi-VN").format(price);
   };
 
-  const isEn = language === "en";
+  const l = (vi, en, hi) => {
+    if (language === "vi") return vi;
+    if (language === "en") return en;
+    return hi || en;
+  };
+
+  const getProp = (viVal, enVal, hiVal) => {
+    if (language === "vi") return viVal;
+    if (language === "en") return enVal;
+    return hiVal || enVal;
+  };
 
   // Translate Category badge
   const categoryLabel = () => {
     switch (tour.category) {
       case "adventure":
-        return isEn ? "Adventure" : "Mạo Hiểm";
+        return l("Mạo Hiểm", "Adventure", "रोमांच");
       case "nature":
-        return isEn ? "Nature" : "Thiên Nhiên";
+        return l("Thiên Nhiên", "Nature", "प्रकृति");
       case "culture":
-        return isEn ? "Culture" : "Văn Hóa";
+        return l("Văn Hóa", "Culture", "संस्कृति");
       case "leisure":
-        return isEn ? "Leisure" : "Nghỉ Dưỡng";
+        return l("Nghỉ Dưỡng", "Leisure", "विश्राम");
       default:
-        return isEn ? "Tour" : "Tour";
+        return l("Tour", "Tour", "टूर");
     }
   };
 
@@ -35,8 +45,8 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
         onClick={() => onDetailClick && onDetailClick(tour)}
         style={{ cursor: "pointer" }}
       >
-        <img src={tour.image} alt={isEn ? (tour.name_en || tour.name) : tour.name} loading="lazy" />
-        {tour.tag && <span className="badge tour-tag">{isEn ? (tour.tag_en || tour.tag) : tour.tag}</span>}
+        <img src={tour.image} alt={getProp(tour.name, tour.name_en, tour.name_hi)} loading="lazy" />
+        {tour.tag && <span className="badge tour-tag">{getProp(tour.tag, tour.tag_en, tour.tag_hi)}</span>}
         <span className="badge tour-category-badge">
           {categoryLabel()}
         </span>
@@ -47,11 +57,11 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
           <div className="tour-meta">
             <div className="tour-rating">
               <Star size={16} fill="#ffb703" stroke="#ffb703" />
-              <span>{tour.rating} ({tour.reviewsCount} {isEn ? "reviews" : "đánh giá"})</span>
+              <span>{tour.rating} ({tour.reviewsCount} {l("đánh giá", "reviews", "समीक्षाएं")})</span>
             </div>
             <div className="tour-duration">
               <Clock size={16} />
-              <span>{isEn ? (tour.duration_en || tour.duration) : tour.duration}</span>
+              <span>{getProp(tour.duration, tour.duration_en, tour.duration_hi)}</span>
             </div>
           </div>
 
@@ -60,13 +70,13 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
             onClick={() => onDetailClick && onDetailClick(tour)}
             style={{ cursor: "pointer" }}
           >
-            {isEn ? (tour.name_en || tour.name) : tour.name}
+            {getProp(tour.name, tour.name_en, tour.name_hi)}
           </h3>
-          <p className="tour-desc" style={{ marginBottom: "12px" }}>{isEn ? (tour.description_en || tour.description) : tour.description}</p>
+          <p className="tour-desc" style={{ marginBottom: "12px" }}>{getProp(tour.description, tour.description_en, tour.description_hi)}</p>
           
           <div style={{ marginBottom: "16px" }}>
             <ul style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              {((isEn && tour.highlights_en) ? tour.highlights_en : (tour.highlights || [])).slice(0, 2).map((highlight, idx) => (
+              {(getProp(tour.highlights, tour.highlights_en, tour.highlights_hi) || []).slice(0, 2).map((highlight, idx) => (
                 <li key={idx} style={{ display: "flex", alignItems: "flex-start", gap: "6px", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.3 }}>
                   <CheckCircle2 size={14} style={{ color: "var(--secondary)", flexShrink: 0, marginTop: "2px" }} />
                   <span>{highlight}</span>
@@ -95,9 +105,9 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
             }}
           >
             {showDetails ? (
-              <>{isEn ? "Hide service details" : "Thu gọn thông tin dịch vụ"} <ChevronUp size={16} /></>
+              <>{l("Thu gọn thông tin dịch vụ", "Hide service details", "जानकारी छुपाएं")} <ChevronUp size={16} /></>
             ) : (
-              <>{isEn ? "Transport, meals, stops details" : "Chi tiết đi lại, ăn uống, điểm dừng"} <ChevronDown size={16} /></>
+              <>{l("Chi tiết đi lại, ăn uống, điểm dừng", "Transport, meals, stops details", "परिवहन, भोजन, स्टॉप विवरण")} <ChevronDown size={16} /></>
             )}
           </button>
 
@@ -120,17 +130,17 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
             >
               <div>
                 <strong style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--primary)", marginBottom: "4px" }}>
-                  <Compass size={14} style={{ color: "var(--secondary)" }} /> {isEn ? "Transportation details" : "Đi lại bằng gì?"}
+                  <Compass size={14} style={{ color: "var(--secondary)" }} /> {l("Đi lại bằng gì?", "Transportation details", "परिवहन विवरण")}
                 </strong>
-                <span style={{ color: "var(--text)" }}>{isEn ? (tour.transportation_en || tour.transportation) : tour.transportation}</span>
+                <span style={{ color: "var(--text)" }}>{getProp(tour.transportation, tour.transportation_en, tour.transportation_hi)}</span>
               </div>
               
               <div>
                 <strong style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--primary)", marginBottom: "4px" }}>
-                  <Utensils size={14} style={{ color: "var(--secondary)" }} /> {isEn ? "Meals & Dining menu" : "Thực đơn ăn uống?"}
+                  <Utensils size={14} style={{ color: "var(--secondary)" }} /> {l("Thực đơn ăn uống?", "Meals & Dining menu", "भोजन और भोजन मेनू")}
                 </strong>
                 <ul style={{ paddingLeft: "14px", listStyleType: "disc", color: "var(--text-muted)" }}>
-                  {(isEn ? (tour.meals_en || tour.meals) : tour.meals).map((dish, i) => (
+                  {(getProp(tour.meals, tour.meals_en, tour.meals_hi) || []).map((dish, i) => (
                     <li key={i}>{dish}</li>
                   ))}
                 </ul>
@@ -138,9 +148,9 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
 
               <div>
                 <strong style={{ display: "flex", alignItems: "center", gap: "6px", color: "var(--primary)", marginBottom: "4px" }}>
-                  <MapPin size={14} style={{ color: "var(--secondary)" }} /> {isEn ? "Stops & Accommodations" : "Điểm dừng chân & Lưu trú?"}
+                  <MapPin size={14} style={{ color: "var(--secondary)" }} /> {l("Điểm dừng chân & Lưu trú?", "Stops & Accommodations", "स्टॉप और आवास")}
                 </strong>
-                <span style={{ color: "var(--text)" }}>{isEn ? (tour.accommodationStops_en || tour.accommodationStops) : tour.accommodationStops}</span>
+                <span style={{ color: "var(--text)" }}>{getProp(tour.accommodationStops, tour.accommodationStops_en, tour.accommodationStops_hi)}</span>
               </div>
             </div>
           )}
@@ -148,10 +158,10 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
 
         <div className="tour-footer" style={{ borderTop: "1px solid rgba(13, 44, 84, 0.08)", paddingTop: "12px", marginTop: "auto" }}>
           <div className="tour-price-box">
-            <span className="price-label">{isEn ? "Price from" : "Giá từ"}</span>
+            <span className="price-label">{l("Giá từ", "Price from", "कीमत से")}</span>
             <span className="price-value">
               {formatPrice(tour.price)}
-              <span>{isEn ? " VND/guest" : " VNĐ/khách"}</span>
+              <span>{l(" VNĐ/khách", " VND/guest", " रुपये/अतिथि")}</span>
             </span>
           </div>
           <div style={{ display: "flex", gap: "6px" }}>
@@ -160,7 +170,7 @@ export default function TourCard({ tour, onBookClick, onDetailClick, language })
               onClick={() => onDetailClick && onDetailClick(tour)} 
               style={{ padding: "8px 12px", fontSize: "0.82rem", fontWeight: "bold" }}
             >
-              {isEn ? "Details" : "Chi Tiết"}
+              {l("Chi Tiết", "Details", "विवरण")}
             </button>
             <button 
               className="btn btn-primary" 

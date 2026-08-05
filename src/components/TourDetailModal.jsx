@@ -10,6 +10,11 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
     if (language === "en") return en;
     return hi || en;
   };
+  const getProp = (viVal, enVal, hiVal) => {
+    if (language === "vi") return viVal;
+    if (language === "en") return enVal;
+    return hiVal || enVal;
+  };
 
   // Tab State: 'overview' | 'itinerary' | 'meals' | 'inclusions'
   const [activeTab, setActiveTab] = useState("overview");
@@ -48,7 +53,7 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
     e.preventDefault();
     const cartItem = {
       tourId: tour.id,
-      tourName: language === "vi" ? tour.name : (tour.name_en || tour.name),
+      tourName: getProp(tour.name, tour.name_en, tour.name_hi),
       price: tour.price,
       date,
       adults,
@@ -75,10 +80,10 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
             <div className="detail-hero-info">
               {tour.tag && (
                 <span className="badge detail-tag-badge">
-                  🔥 {language === "vi" ? tour.tag : (tour.tag_en || tour.tag)}
+                  🔥 {getProp(tour.tag, tour.tag_en, tour.tag_hi)}
                 </span>
               )}
-              <h2>{language === "vi" ? tour.name : (tour.name_en || tour.name)}</h2>
+              <h2>{getProp(tour.name, tour.name_en, tour.name_hi)}</h2>
               
               <div className="detail-quick-meta">
                 <span className="meta-item rating">
@@ -87,7 +92,7 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
                 </span>
                 <span className="meta-item">
                   <Clock size={16} />
-                  {language === "vi" ? tour.duration : (tour.duration_en || tour.duration)}
+                  {getProp(tour.duration, tour.duration_en, tour.duration_hi)}
                 </span>
                 <span className="meta-item">
                   <MapPin size={16} />
@@ -102,7 +107,7 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
         <div className="detail-breadcrumbs">
           <span>{l("Trang chủ", "Home", "होम")}</span> &gt; 
           <span>{l("Tour Du Lịch", "Tours", "पर्यटन")}</span> &gt; 
-          <span className="active">{language === "vi" ? tour.name : (tour.name_en || tour.name)}</span>
+          <span className="active">{getProp(tour.name, tour.name_en, tour.name_hi)}</span>
         </div>
 
         {/* Content Layout: 70% Left Columns, 30% Right Sticky booking column */}
@@ -147,14 +152,14 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
                 <div className="animate-fade-in">
                   <h4 className="panel-title">{l("Mô tả hành trình", "About This Tour", "दौरे के बारे में")}</h4>
                   <p className="panel-desc">
-                    {language === "vi" ? tour.description : (tour.description_en || tour.description)}
+                    {getProp(tour.description, tour.description_en, tour.description_hi)}
                   </p>
 
                   <h4 className="panel-title" style={{ marginTop: "24px" }}>
                     ⭐ {l("Điểm nổi bật của Tour", "Tour Highlights", "दौरे की मुख्य विशेषताएं")}
                   </h4>
                   <div className="highlights-grid">
-                    {(language === "vi" ? (tour.highlights || []) : (tour.highlights_en || [])).map((hl, i) => (
+                    {(getProp(tour.highlights, tour.highlights_en, tour.highlights_hi) || []).map((hl, i) => (
                       <div key={i} className="highlight-item">
                         <CheckCircle2 size={18} className="success-icon" />
                         <span>{hl}</span>
@@ -183,7 +188,7 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
                   <h4 className="panel-title">{l("Lịch trình chi tiết theo giờ", "Day Itinerary Schedule", "विस्तृत दैनिक कार्यक्रम")}</h4>
                   
                   <div className="itinerary-timeline">
-                    {(language === "vi" ? tour.itinerary : tour.itinerary_en).map((step, idx) => {
+                    {(getProp(tour.itinerary, tour.itinerary_en, tour.itinerary_hi) || []).map((step, idx) => {
                       const isOpen = openItineraryIdx === idx;
                       return (
                         <div key={idx} className={`timeline-item ${isOpen ? "active" : ""}`}>
@@ -225,7 +230,7 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
                         {l("Dịch vụ bao gồm", "What's Included", "शामिल सेवाएं")}
                       </h4>
                       <ul className="inc-list">
-                        {(language === "vi" ? (tour.included || []) : (tour.included_en || [])).map((item, i) => (
+                        {(getProp(tour.included, tour.included_en, tour.included_hi) || []).map((item, i) => (
                           <li key={i}>
                             <CheckCircle2 size={14} className="success-icon list-bullet" />
                             <span>{item}</span>
@@ -241,7 +246,7 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
                         {l("Không bao gồm", "What's Excluded", "शामिल नहीं")}
                       </h4>
                       <ul className="inc-list">
-                        {(language === "vi" ? (tour.excluded || []) : (tour.excluded_en || [])).map((item, i) => (
+                        {(getProp(tour.excluded, tour.excluded_en, tour.excluded_hi) || []).map((item, i) => (
                           <li key={i}>
                             <XCircle size={14} className="danger-icon list-bullet" />
                             <span>{item}</span>
@@ -268,7 +273,7 @@ export default function TourDetailModal({ isOpen, onClose, tour, onAddToCart, la
                   </p>
                   
                   <div className="meals-menu-grid">
-                    {(language === "vi" ? (tour.meals || []) : (tour.meals_en || [])).map((meal, idx) => (
+                    {(getProp(tour.meals, tour.meals_en, tour.meals_hi) || []).map((meal, idx) => (
                       <div key={idx} className="menu-dish-card">
                         <Utensils size={16} style={{ color: "var(--primary)", opacity: 0.8 }} />
                         <span>{meal}</span>

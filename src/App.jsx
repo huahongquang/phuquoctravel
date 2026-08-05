@@ -85,8 +85,7 @@ export default function App() {
   }, []);
 
   // Language toggle handler
-  const handleLanguageToggle = () => {
-    const newLang = language === "vi" ? "en" : language === "en" ? "hi" : "vi";
+  const handleLanguageChange = (newLang) => {
     setLanguage(newLang);
     localStorage.setItem("pq_lang", newLang);
   };
@@ -315,7 +314,7 @@ export default function App() {
         onLoginClick={() => setIsLoginModalOpen(true)}
         onLogout={handleLogout}
         language={language}
-        onLanguageToggle={handleLanguageToggle}
+        onLanguageChange={handleLanguageChange}
       />
 
       {/* Hero Banner Section */}
