@@ -1897,6 +1897,7 @@ table td {
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .detail-breadcrumbs span.active {
@@ -1924,6 +1925,7 @@ table td {
   gap: 16px;
   overflow-x: auto;
   padding-bottom: 1px;
+  width: 100%;
 }
 
 .detail-tabs-bar .tab-btn {
