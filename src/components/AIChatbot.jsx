@@ -47,6 +47,7 @@ export default function AIChatbot({ onBookTour, language }) {
   }, [messages]);
 
   const scrollToBottom = () => {
+    if (messages.length <= 1) return;
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
