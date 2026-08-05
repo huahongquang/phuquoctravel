@@ -130,80 +130,58 @@ export default function CustomTourBuilder({ onBookCustomItinerary, servicesDatab
                     key={item.id}
                     className="bank-item-card"
                   >
-                    <div>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px" }}>
-                        <span style={{ background: "rgba(0,168,150,0.08)", padding: "6px", borderRadius: "8px", color: "var(--secondary)" }}>
-                          {activeCategory === "hotel" && <Hotel size={18} />}
-                          {activeCategory === "dining" && <Utensils size={18} />}
-                          {activeCategory === "activity" && <Compass size={18} />}
+                    {/* Render Image directly on Card */}
+                    {item.image && (
+                      <div className="bank-item-image-wrapper">
+                        <img src={item.image} alt={displayName} className="bank-item-thumbnail" />
+                        <span className="bank-item-category-icon">
+                          {activeCategory === "hotel" && <Hotel size={14} />}
+                          {activeCategory === "dining" && <Utensils size={14} />}
+                          {activeCategory === "activity" && <Compass size={14} />}
                         </span>
                       </div>
-                      <h4 className="bank-item-name">{displayName}</h4>
-                      <p className="bank-item-desc">{displayDesc}</p>
+                    )}
 
-                      {/* Media indicators & Toggle button */}
-                      {(item.image || item.video || item.youtube) && (
-                        <div style={{ marginTop: "10px", display: "flex", flexWrap: "wrap", gap: "6px", alignItems: "center" }}>
-                          {item.image && <span style={{ fontSize: "0.65rem", background: "rgba(16,185,129,0.08)", color: "#10b981", padding: "2px 4px", borderRadius: "3px", fontWeight: 600 }}>🖼️ Ảnh</span>}
-                          {item.video && <span style={{ fontSize: "0.65rem", background: "rgba(59,130,246,0.08)", color: "#3b82f6", padding: "2px 4px", borderRadius: "3px", fontWeight: 600 }}>🎥 Video</span>}
-                          {item.youtube && <span style={{ fontSize: "0.65rem", background: "rgba(239,68,68,0.08)", color: "#ef4444", padding: "2px 4px", borderRadius: "3px", fontWeight: 600 }}>▶️ YT</span>}
-                          
+                    <div className="bank-item-info-body" style={{ padding: "16px 16px 0 16px", flexGrow: 1 }}>
+                      <h4 className="bank-item-name">{displayName}</h4>
+                      <p className="bank-item-desc" style={{ marginTop: "6px" }}>{displayDesc}</p>
+
+                      {/* Video/Youtube indicator stay clean */}
+                      {item.youtube && (
+                        <div style={{ marginTop: "10px" }}>
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setShowMediaId(showMediaId === item.id ? null : item.id);
-                            }}
-                            style={{
-                              marginLeft: "auto",
-                              background: "none",
-                              border: "none",
-                              color: "var(--secondary)",
-                              fontSize: "0.72rem",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              padding: "2px 0"
-                            }}
+                            className="btn btn-outline"
+                            onClick={() => setShowMediaId(showMediaId === item.id ? null : item.id)}
+                            style={{ padding: "4px 10px", fontSize: "0.7rem", display: "flex", gap: "4px", borderColor: "var(--primary)", color: "var(--primary)" }}
                           >
-                            {showMediaId === item.id ? (isEn ? "Hide" : "Ẩn media") : (isEn ? "Media" : "Xem media")}
+                            <span>🎥 {showMediaId === item.id ? (isEn ? "Hide Video" : "Ẩn video") : (isEn ? "Watch Video" : "Xem video")}</span>
                           </button>
                         </div>
                       )}
 
-                      {/* Collapsible Media Player */}
-                      {showMediaId === item.id && (
-                        <div style={{ marginTop: "12px", borderTop: "1px dashed rgba(0,0,0,0.08)", paddingTop: "10px" }}>
-                          {item.image && (
-                            <div style={{ borderRadius: "8px", overflow: "hidden", marginBottom: "8px", maxHeight: "150px" }}>
-                              <img src={item.image} alt={displayName} style={{ width: "100%", height: "140px", objectFit: "cover" }} />
-                            </div>
-                          )}
-                          {item.video && (
-                            <div style={{ borderRadius: "8px", overflow: "hidden", marginBottom: "8px" }}>
-                              <video src={item.video} controls style={{ width: "100%", maxHeight: "140px", background: "#000" }} />
-                            </div>
-                          )}
-                          {item.youtube && (
-                            <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: "8px", marginBottom: "8px" }}>
-                              <iframe
-                                src={item.youtube.includes("watch?v=") 
-                                  ? item.youtube.replace("watch?v=", "embed/").split("&")[0] 
-                                  : item.youtube.includes("youtu.be/") 
-                                    ? item.youtube.replace("youtu.be/", "youtube.com/embed/") 
-                                    : item.youtube}
-                                title="YouTube player"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-                              />
-                            </div>
-                          )}
+                      {/* Collapsible Youtube Video Player */}
+                      {showMediaId === item.id && item.youtube && (
+                        <div style={{ marginTop: "10px" }}>
+                          <div style={{ position: "relative", paddingBottom: "56.25%", height: 0, overflow: "hidden", borderRadius: "8px" }}>
+                            <iframe
+                              src={item.youtube.includes("watch?v=") 
+                                ? item.youtube.replace("watch?v=", "embed/").split("&")[0] 
+                                : item.youtube.includes("youtu.be/") 
+                                  ? item.youtube.replace("youtu.be/", "youtube.com/embed/") 
+                                  : item.youtube}
+                              title="YouTube player"
+                              frameBorder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                            />
+                          </div>
                         </div>
                       )}
                     </div>
 
-                    <div className="bank-item-footer">
+                    <div className="bank-item-footer" style={{ padding: "0 16px 16px 16px", marginTop: "12px" }}>
                       <span className="bank-item-price">{formatPrice(item.price)} đ</span>
                       <button
                         type="button"
