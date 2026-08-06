@@ -1082,12 +1082,24 @@ export default function AdminDashboard({
                           {order.referrer && <span style={{ fontSize: "0.78rem", background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "3px 8px", borderRadius: "10px", marginLeft: "12px", fontWeight: 700 }}>🔗 Affiliate: {order.referrer}</span>}
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                          <span style={{ fontSize: "0.8rem", fontWeight: 700, padding: "4px 10px", borderRadius: "20px", background: order.status === "confirmed" ? "rgba(16, 185, 129, 0.1)" : "rgba(255, 170, 13, 0.1)", color: order.status === "confirmed" ? "#10b981" : "#FFAA0D" }}>
-                            {order.status === "confirmed" ? (isEn ? "Confirmed" : "Đã Xác Nhận") : (isEn ? "Pending" : "Chờ Duyệt")}
+                          <span style={{
+                            fontSize: "0.8rem",
+                            fontWeight: 700,
+                            padding: "4px 10px",
+                            borderRadius: "20px",
+                            background: order.status === "confirmed" ? "rgba(16, 185, 129, 0.1)" : order.status === "unpaid_cod" ? "rgba(100, 64, 251, 0.1)" : "rgba(255, 170, 13, 0.1)",
+                            color: order.status === "confirmed" ? "#10b981" : order.status === "unpaid_cod" ? "#6440FB" : "#FFAA0D"
+                          }}>
+                            {order.status === "confirmed"
+                              ? (isEn ? "Paid / Confirmed" : "Đã Thanh Toán")
+                              : order.status === "unpaid_cod"
+                                ? (isEn ? "COD / Unpaid" : "Thanh Toán COD")
+                                : (isEn ? "Pending Payment" : "Chờ Chuyển Khoản")
+                            }
                           </span>
-                          {order.status === "pending" && (
+                          {order.status !== "confirmed" && (
                             <button className="btn btn-primary" onClick={() => onConfirmBooking(order.bookingId)} style={{ background: "var(--tourex-primary)", padding: "6px 14px", fontSize: "0.8rem", borderRadius: "6px", display: "flex", alignItems: "center", gap: "4px" }}>
-                              <CheckCircle2 size={14} /> {isEn ? "Approve Booking" : "Duyệt đơn hàng"}
+                              <CheckCircle2 size={14} /> {isEn ? "Mark as Paid" : "Xác nhận đã thanh toán"}
                             </button>
                           )}
                           <button 

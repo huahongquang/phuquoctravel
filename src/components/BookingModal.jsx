@@ -6,12 +6,13 @@ export default function BookingModal({
   isOpen,
   onClose,
   tour,
-  view, // 'add-to-cart' | 'checkout' | 'receipt'
+  view, // 'add-to-cart' | 'checkout' | 'payment' | 'receipt'
   cartItems,
   onAddToCart,
   onCheckoutSubmit,
   bookingDetails, // Details of completed booking for receipt
-  language
+  language,
+  onConfirmPayment
 }) {
   const t = translations[language || "vi"];
   const isEn = language === "en";
@@ -30,6 +31,7 @@ export default function BookingModal({
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("bank"); // 'bank' | 'cod'
 
   // Min date is today
   useEffect(() => {
@@ -41,6 +43,126 @@ export default function BookingModal({
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat("vi-VN").format(price);
+  };
+
+  const handlePrintBooking = (order) => {
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      alert(isEn ? "Popup blocker is enabled. Please allow popups to download ticket." : "Trình chặn popup đang bật. Vui lòng cho phép popup để tải xuống vé.");
+      return;
+    }
+    const invoiceHtml = `
+      <html>
+        <head>
+          <title>Phú Quốc Travel - E-Ticket #${order.bookingId}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #1e293b; background: #fff; line-height: 1.5; }
+            .invoice-card { max-width: 800px; margin: 0 auto; border: 1px solid #e2e8f0; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #00a896; padding-bottom: 20px; margin-bottom: 30px; }
+            .company-info h1 { margin: 0; color: #0d2c54; font-size: 24px; font-weight: 800; }
+            .company-info p { margin: 4px 0 0; color: #64748b; font-size: 13px; }
+            .invoice-meta { text-align: right; font-size: 13px; color: #475569; }
+            .invoice-meta h2 { margin: 0 0 8px; color: #00a896; font-size: 20px; font-weight: 700; text-transform: uppercase; }
+            .section { margin-bottom: 25px; }
+            .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #0f172a; border-bottom: 1px solid #cbd5e1; padding-bottom: 6px; margin-bottom: 12px; }
+            .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px; }
+            .info-item strong { color: #475569; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th, td { padding: 12px; border-bottom: 1px solid #e2e8f0; text-align: left; font-size: 13px; }
+            th { background-color: #f8fafc; font-weight: 600; color: #334155; }
+            .total-row { font-weight: 700; font-size: 15px; background-color: #f1f5f9; }
+            .total-row td { border-top: 2px solid #cbd5e1; }
+            .signature-section { margin-top: 50px; display: flex; justify-content: space-between; page-break-inside: avoid; }
+            .signature-box { text-align: center; width: 220px; font-size: 13px; }
+            .footer { margin-top: 60px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px dashed #e2e8f0; padding-top: 20px; }
+            @media print {
+              body { padding: 0; background: #fff; }
+              .invoice-card { border: none; box-shadow: none; padding: 0; max-width: 100%; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-card">
+            <div class="header">
+              <div class="company-info">
+                <h1>PHÚ QUỐC TRAVEL</h1>
+                <p>${isEn ? "Address: Tran Hung Dao Street, Duong Dong, Phu Quoc Island, Vietnam" : "Địa chỉ: Đường Trần Hưng Đạo, Dương Đông, Phú Quốc, Kiên Giang"}</p>
+                <p>Hotline: 0987.654.321 • Email: info@phuquoctravel.com</p>
+              </div>
+              <div class="invoice-meta">
+                <h2>${isEn ? "E-Ticket E-Pass" : "Vé Điện Tử Trải Nghiệm"}</h2>
+                <div>${isEn ? "Order ID" : "Mã đặt vé"}: <strong>${order.bookingId}</strong></div>
+                <div>${isEn ? "Status" : "Trạng thái"}: <strong>${order.status === "confirmed" ? (isEn ? "PAID" : "ĐÃ THANH TOÁN") : order.status === "unpaid_cod" ? (isEn ? "COD PENDING" : "THANH TOÁN COD") : (isEn ? "UNPAID" : "CHỜ THANH TOÁN")}</strong></div>
+                <div>${isEn ? "Date" : "Ngày đặt"}: ${order.bookingDate}</div>
+              </div>
+            </div>
+            
+            <div class="section">
+              <div class="section-title">${isEn ? "Passenger Details" : "Thông tin hành khách"}</div>
+              <div class="info-grid">
+                <div class="info-item"><strong>${isEn ? "Full Name" : "Khách hàng"}:</strong> ${order.fullName}</div>
+                <div class="info-item"><strong>${isEn ? "Phone Number" : "Số điện thoại"}:</strong> ${order.phone}</div>
+                <div class="info-item" style="grid-column: span 2;"><strong>Email:</strong> ${order.email}</div>
+              </div>
+            </div>
+ 
+            <div class="section">
+              <div class="section-title">${isEn ? "Itinerary Sightseeing List" : "Danh sách dịch vụ trong hành trình"}</div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>${isEn ? "Sightseeing Service / Package" : "Dịch vụ / Gói Tour"}</th>
+                    <th>${isEn ? "Itinerary Details / Options" : "Chi tiết hành trình / Tùy chọn"}</th>
+                    <th style="text-align: right; width: 150px;">${isEn ? "Total Price" : "Thành tiền"}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${order.items.map(item => `
+                    <tr>
+                      <td><strong>${item.tourName}</strong></td>
+                      <td style="color: #475569; font-size: 12px;">
+                        ${!item.isCustom 
+                          ? `${isEn ? "Departure" : "Khởi hành"}: ${new Date(item.date).toLocaleDateString(isEn ? "en-US" : "vi-VN")} • ${item.adults} ${isEn ? "Ad" : "NL"}, ${item.children} ${isEn ? "Ch" : "TE"}`
+                          : `${isEn ? "Custom Itinerary: " : "Tự thiết kế gồm: "}${item.customItems?.map(c => c.name).join(", ")}`
+                        }
+                      </td>
+                      <td style="text-align: right; font-weight: 700; color: #00a896;">
+                        ${new Intl.NumberFormat("vi-VN").format(item.totalPrice)} đ
+                      </td>
+                    </tr>
+                  `).join("")}
+                  <tr class="total-row">
+                    <td colspan="2" style="text-align: right;">${isEn ? "TOTAL AMOUNT" : "TỔNG CỘNG THANH TOÁN"}:</td>
+                    <td style="text-align: right; color: #ffb703;">
+                      ${new Intl.NumberFormat("vi-VN").format(order.totalAmount)} đ
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="margin-top: 24px; text-align: center;">
+              <div style="width: 100%; height: 40px; background: repeating-linear-gradient(90deg, #000, #000 2px, #fff 2px, #fff 8px);"></div>
+              <span style="font-size: 12px; color: #64748b;">${order.bookingId} - ${isEn ? "PRESENT THIS E-PASS AT BOARDING" : "HÃY XUẤT TRÌNH VÉ NÀY TẠI ĐIỂM ĐÓN KHÁCH"}</span>
+            </div>
+ 
+            <div class="footer">
+              <p>${isEn ? "Thank you for choosing Phu Quoc Travel!" : "Cảm ơn quý khách đã tin tưởng và lựa chọn dịch vụ của Phú Quốc Travel!"}</p>
+              <p>${isEn ? "We wish you a wonderful and memorable holiday!" : "Chúc quý khách có một chuyến đi vui vẻ và ý nghĩa!"}</p>
+            </div>
+          </div>
+ 
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(invoiceHtml);
+    printWindow.document.close();
   };
 
   // Live calculation for the selected tour (add-to-cart view)
@@ -216,6 +338,159 @@ export default function BookingModal({
           </div>
         )}
 
+        {/* 2.5. VIEW PAYMENT METHOD & PDF DOWNLOAD */}
+        {view === "payment" && bookingDetails && (
+          <div>
+            <div className="modal-header" style={{ background: "var(--primary)", borderBottom: "none" }}>
+              <CheckCircle2 size={24} style={{ color: "#10b981" }} />
+              <div>
+                <h3 style={{ margin: 0, color: "var(--white)", fontSize: "1.15rem", fontWeight: 700 }}>
+                  {t.payment_title}
+                </h3>
+                <span style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.8)" }}>
+                  {l("Mã đặt vé: ", "Booking ID: ", "बुकिंग आईडी: ")}{bookingDetails.bookingId}
+                </span>
+              </div>
+            </div>
+
+            <div className="modal-body" style={{ padding: "30px 40px", background: "var(--white)", borderRadius: "0 0 24px 24px" }}>
+              {/* Step 1: Export PDF */}
+              <div style={{ background: "rgba(0, 168, 150, 0.05)", border: "1px solid rgba(0, 168, 150, 0.15)", borderRadius: "12px", padding: "16px 20px", marginBottom: "24px" }}>
+                <h4 style={{ color: "var(--primary)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 8px 0" }}>
+                  {t.payment_step1}
+                </h4>
+                <p style={{ margin: "0 0 12px 0", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
+                  {l(
+                    "Hành trình của bạn đã được ghi nhận. Vui lòng tải xuống bản in Vé điện tử (PDF) để lưu trữ và xuất trình khi khởi hành.",
+                    "Your itinerary has been saved. Please download the printed E-Ticket (PDF) for boarding.",
+                    "आपकी यात्रा कार्यक्रम सहेज लिया गया है। कृपया बोर्डिंग के लिए मुद्रित ई-टिकट (पीडीएफ) डाउनलोड करें।"
+                  )}
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => handlePrintBooking(bookingDetails)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    borderColor: "var(--secondary)",
+                    color: "var(--secondary)",
+                    padding: "10px 20px",
+                    fontWeight: 700,
+                    borderRadius: "8px",
+                    fontSize: "0.82rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  <Ticket size={16} /> {t.payment_step1_btn}
+                </button>
+              </div>
+
+              {/* Step 2: Choose Payment Method */}
+              <div style={{ borderTop: "1px solid rgba(0,0,0,0.06)", paddingTop: "20px" }}>
+                <h4 style={{ color: "var(--primary)", fontSize: "0.95rem", fontWeight: 700, margin: "0 0 16px 0" }}>
+                  {t.payment_step2}
+                </h4>
+
+                {/* Tabs */}
+                <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("bank")}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      borderRadius: "10px",
+                      border: paymentMethod === "bank" ? "2px solid var(--secondary)" : "1px solid rgba(0,0,0,0.08)",
+                      background: paymentMethod === "bank" ? "rgba(255, 183, 3, 0.05)" : "transparent",
+                      color: paymentMethod === "bank" ? "var(--secondary)" : "var(--text-muted)",
+                      fontWeight: 700,
+                      fontSize: "0.85rem",
+                      cursor: "pointer",
+                      transition: "var(--transition)"
+                    }}
+                  >
+                    🏦 {t.payment_bank}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod("cod")}
+                    style={{
+                      flex: 1,
+                      padding: "12px",
+                      borderRadius: "10px",
+                      border: paymentMethod === "cod" ? "2px solid var(--secondary)" : "1px solid rgba(0,0,0,0.08)",
+                      background: paymentMethod === "cod" ? "rgba(255, 183, 3, 0.05)" : "transparent",
+                      color: paymentMethod === "cod" ? "var(--secondary)" : "var(--text-muted)",
+                      fontWeight: 700,
+                      fontSize: "0.85rem",
+                      cursor: "pointer",
+                      transition: "var(--transition)"
+                    }}
+                  >
+                    💵 {t.payment_cod}
+                  </button>
+                </div>
+
+                {/* Tab content 1: Bank Transfer */}
+                {paymentMethod === "bank" && (
+                  <div style={{ background: "#f8fafc", border: "1px solid rgba(0,0,0,0.04)", borderRadius: "12px", padding: "20px", display: "grid", gridTemplateColumns: "1fr 1.2fr", gap: "20px", alignItems: "center" }}>
+                    {/* QR MB VietQR */}
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#fff", padding: "12px", borderRadius: "10px", border: "1px solid rgba(0,0,0,0.05)" }}>
+                      <img
+                        src={`https://img.vietqr.io/image/mb-0987654321-compact.png?amount=${bookingDetails.totalAmount}&addInfo=${bookingDetails.bookingId}&accountName=PHU%20QUOC%20TRAVEL`}
+                        alt="MB Bank VietQR Code"
+                        style={{ width: "100%", maxHeight: "170px", objectFit: "contain" }}
+                      />
+                      <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginTop: "8px", fontWeight: 600 }}>Quét mã QR để chuyển khoản nhanh</span>
+                    </div>
+
+                    {/* Details */}
+                    <div>
+                      <h5 style={{ margin: "0 0 10px 0", color: "var(--primary)", fontSize: "0.85rem", fontWeight: 700 }}>{t.bank_title}</h5>
+                      <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "0.78rem", color: "var(--text)" }}>
+                        <div><strong>Ngân hàng:</strong> MB Bank (Ngân hàng Quân đội)</div>
+                        <div><strong>{t.bank_account_no}</strong> 0987654321</div>
+                        <div><strong>{t.bank_account_name}</strong> CONG TY CO PHAN DU LICH PHU QUOC</div>
+                        <div><strong>{t.bank_amount}</strong> <span style={{ color: "var(--secondary)", fontWeight: 700 }}>{formatPrice(bookingDetails.totalAmount)} đ</span></div>
+                        <div><strong>{t.bank_memo}</strong> <span style={{ background: "rgba(255, 183, 3, 0.15)", padding: "2px 6px", borderRadius: "4px", fontWeight: 700, color: "var(--primary)" }}>{bookingDetails.bookingId}</span></div>
+                      </div>
+                      
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => onConfirmPayment(bookingDetails.bookingId, "confirmed")}
+                        style={{ width: "100%", marginTop: "16px", padding: "10px 14px", borderRadius: "8px", fontSize: "0.8rem", fontWeight: 700 }}
+                      >
+                        {t.bank_btn_confirm}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab content 2: COD */}
+                {paymentMethod === "cod" && (
+                  <div style={{ background: "#f8fafc", border: "1px solid rgba(0,0,0,0.04)", borderRadius: "12px", padding: "20px" }}>
+                    <h5 style={{ margin: "0 0 8px 0", color: "var(--primary)", fontSize: "0.85rem", fontWeight: 700 }}>{t.cod_title}</h5>
+                    <p style={{ margin: "0 0 16px 0", fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.5 }}>
+                      {t.cod_desc}
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => onConfirmPayment(bookingDetails.bookingId, "unpaid_cod")}
+                      style={{ padding: "10px 20px", borderRadius: "8px", fontSize: "0.8rem", fontWeight: 700 }}
+                    >
+                      {t.cod_btn_confirm}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* 3. VIEW TICKET RECEIPT */}
         {view === "receipt" && bookingDetails && (
           <div>
@@ -232,9 +507,24 @@ export default function BookingModal({
             </div>
 
             <div className="modal-body" style={{ padding: "30px 40px", background: "var(--white)", borderRadius: "0 0 24px 24px" }}>
-              <p className="receipt-subtitle" style={{ fontSize: "0.82rem", color: "var(--text-muted)", textAlign: "center", marginBottom: "20px", fontWeight: 500 }}>
-                {t.receipt_subtitle}
-              </p>
+              {/* Payment status badge */}
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: "20px" }}>
+                <span style={{
+                  fontSize: "0.82rem",
+                  fontWeight: 700,
+                  padding: "6px 16px",
+                  borderRadius: "20px",
+                  background: bookingDetails.status === "confirmed" ? "rgba(16, 185, 129, 0.1)" : bookingDetails.status === "unpaid_cod" ? "rgba(100, 64, 251, 0.1)" : "rgba(255, 170, 13, 0.1)",
+                  color: bookingDetails.status === "confirmed" ? "#10b981" : bookingDetails.status === "unpaid_cod" ? "#6440FB" : "#FFAA0D"
+                }}>
+                  {bookingDetails.status === "confirmed" 
+                    ? l("● Trạng thái: ĐÃ THANH TOÁN (Vé Đã Kích Hoạt)", "● Status: PAID (E-Ticket Activated)", "● स्थिति: भुगतान किया गया")
+                    : bookingDetails.status === "unpaid_cod"
+                      ? l("● Trạng thái: CHỜ THANH TOÁN COD (Khi Nhận Khách)", "● Status: COD PENDING (On Arrival)", "● स्थिति: सीओडी लंबित")
+                      : l("● Trạng thái: CHỜ CHUYỂN KHOẢN (Chưa Thanh Toán)", "● Status: PENDING BANK TRANSFER (Unpaid)", "● स्थिति: बैंक ट्रांसफर लंबित")
+                  }
+                </span>
+              </div>
 
               <div className="receipt-info-grid">
                 <div className="receipt-field">
@@ -293,7 +583,12 @@ export default function BookingModal({
               </div>
 
               <div className="receipt-total-row" style={{ display: "flex", justifyContent: "space-between", borderTop: "2px solid var(--primary)", paddingTop: "16px", marginTop: "20px" }}>
-                <span style={{ fontWeight: 600, color: "var(--primary)" }}>{l("Tổng cộng đã thanh toán", "Total Amount Paid", "कुल भुगतान किया गया")}</span>
+                <span style={{ fontWeight: 600, color: "var(--primary)" }}>
+                  {bookingDetails.status === "confirmed"
+                    ? l("Tổng cộng đã thanh toán", "Total Amount Paid", "कुल भुगतान किया गया")
+                    : l("Tổng chi phí cần thanh toán", "Total Amount Due", "कुल देय राशि")
+                  }
+                </span>
                 <span className="total-amount" style={{ fontSize: "1.3rem", color: "var(--secondary)", fontWeight: 800 }}>{formatPrice(bookingDetails.totalAmount)} VNĐ</span>
               </div>
 

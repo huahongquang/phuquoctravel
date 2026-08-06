@@ -201,7 +201,7 @@ export default function App() {
       ...contactInfo,
       items: [...cart],
       totalAmount: totalAmount,
-      status: "pending",
+      status: "unpaid",
       referrer: activeReferrer || null
     };
 
@@ -212,8 +212,19 @@ export default function App() {
     setBookings(updatedBookings);
     apiService.saveBookings(updatedBookings);
 
-    setModalView("receipt");
+    setModalView("payment");
     setCart([]);
+  };
+
+  // Callback to update payment status and go to final receipt view
+  const handleConfirmPayment = (bookingId, status) => {
+    const updated = bookings.map(b => 
+      b.bookingId === bookingId ? { ...b, status } : b
+    );
+    setBookings(updated);
+    apiService.saveBookings(updated);
+    setBookingDetails(prev => prev && prev.bookingId === bookingId ? { ...prev, status } : prev);
+    setModalView("receipt");
   };
 
   // --- SECURE AUTH PORTAL HANDLERS ---
@@ -397,6 +408,7 @@ export default function App() {
         onCheckoutSubmit={handleCheckoutSubmit}
         bookingDetails={bookingDetails}
         language={language}
+        onConfirmPayment={handleConfirmPayment}
       />
 
       {/* PORTAL LOGIN MODAL (Username & Password) */}
