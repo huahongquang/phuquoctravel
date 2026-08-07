@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Database, ShoppingBag, Plus, Trash2, CheckCircle2, X, ArrowLeft, 
   BarChart2, Shield, Users, FileText, Compass, DollarSign, Award, 
@@ -24,14 +24,62 @@ export default function AdminDashboard({
   onDeleteTour,
   guides,
   onAddGuide,
-  onDeleteGuide
+  onDeleteGuide,
+  paymentSettings,
+  onUpdatePaymentSettings
 }) {
   const isEn = language === "en";
   
-  const [activeTab, setActiveTab] = useState("dashboard"); // 'dashboard' | 'services' | 'bookings' | 'tours' | 'blogs' | 'guides'
+  const [activeTab, setActiveTab] = useState("dashboard"); // 'dashboard' | 'services' | 'bookings' | 'tours' | 'blogs' | 'guides' | 'payment_settings'
   const [serviceCategory, setServiceCategory] = useState("hotel");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+
+  // --- PAYMENT SETTINGS FORM STATES ---
+  const [bankNameVal, setBankNameVal] = useState(paymentSettings?.bankName || "");
+  const [accountNoVal, setAccountNoVal] = useState(paymentSettings?.accountNo || "");
+  const [accountNameVal, setAccountNameVal] = useState(paymentSettings?.accountName || "");
+  const [bankIdVal, setBankIdVal] = useState(paymentSettings?.bankId || "mb");
+  const [qrTypeVal, setQrTypeVal] = useState(paymentSettings?.qrType || "api");
+  const [customQrUrlVal, setCustomQrUrlVal] = useState(paymentSettings?.customQrUrl || "");
+  const [base64QrVal, setBase64QrVal] = useState(paymentSettings?.base64Qr || "");
+
+  useEffect(() => {
+    if (paymentSettings) {
+      setBankNameVal(paymentSettings.bankName || "");
+      setAccountNoVal(paymentSettings.accountNo || "");
+      setAccountNameVal(paymentSettings.accountName || "");
+      setBankIdVal(paymentSettings.bankId || "mb");
+      setQrTypeVal(paymentSettings.qrType || "api");
+      setCustomQrUrlVal(paymentSettings.customQrUrl || "");
+      setBase64QrVal(paymentSettings.base64Qr || "");
+    }
+  }, [paymentSettings]);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setBase64QrVal(reader.result);
+        setCustomQrUrlVal(""); // Clear text URL if file uploaded
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSaveSettings = () => {
+    onUpdatePaymentSettings({
+      bankName: bankNameVal,
+      accountNo: accountNoVal,
+      accountName: accountNameVal,
+      bankId: bankIdVal,
+      qrType: qrTypeVal,
+      customQrUrl: customQrUrlVal,
+      base64Qr: base64QrVal
+    });
+    alert(isEn ? "Payment configurations saved successfully!" : "Lưu cấu hình thanh toán thành công!");
+  };
 
   // Submenu states
   const [openSubmenu, setOpenSubmenu] = useState({
@@ -515,7 +563,10 @@ export default function AdminDashboard({
             <span>SEO Setup</span>
           </div>
 
-          <div className="tourex-menu-item" onClick={() => mockTriggerAlert("Payment Gateway setup")}>
+          <div 
+            className={`tourex-menu-item ${activeTab === "payment_settings" ? "active" : ""}`}
+            onClick={() => setActiveTab("payment_settings")}
+          >
             <DollarSign className="tourex-menu-icon" size={18} />
             <span>{isEn ? "Payment Method" : "Cổng thanh toán"}</span>
           </div>
@@ -1147,6 +1198,159 @@ export default function AdminDashboard({
                   ))}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 6: PAYMENT GATEWAY & BANK TRANSFER SETTINGS */}
+          {activeTab === "payment_settings" && (
+            <div className="tourex-card-panel animate-fade-in" style={{ animation: "fadeIn 0.4s ease" }}>
+              <h3 style={{ fontSize: "1.1rem", marginBottom: "20px", color: "var(--tourex-text-navy)", fontWeight: 800 }}>
+                {isEn ? "Payment Method & QR Configurations" : "Cấu Hình Cổng Thanh Toán & QR Ngân Hàng"}
+              </h3>
+              
+              <div style={{ maxWidth: "650px", display: "flex", flexDirection: "column", gap: "20px" }}>
+                {/* Bank Name */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--tourex-text-navy)" }}>
+                    {isEn ? "Bank Name" : "Tên ngân hàng"}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={bankNameVal}
+                    onChange={(e) => setBankNameVal(e.target.value)}
+                    style={{ padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.9rem", color: "var(--tourex-text-navy)", outline: "none" }}
+                    placeholder="E.g. MB Bank (Ngân hàng Quân đội)"
+                  />
+                </div>
+
+                {/* Account Number */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--tourex-text-navy)" }}>
+                    {isEn ? "Account Number" : "Số tài khoản nhận tiền"}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={accountNoVal}
+                    onChange={(e) => setAccountNoVal(e.target.value)}
+                    style={{ padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.9rem", color: "var(--tourex-text-navy)", outline: "none" }}
+                    placeholder="E.g. 0987654321"
+                  />
+                </div>
+
+                {/* Account Name */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--tourex-text-navy)" }}>
+                    {isEn ? "Account Holder Name" : "Tên người thụ hưởng"}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={accountNameVal}
+                    onChange={(e) => setAccountNameVal(e.target.value)}
+                    style={{ padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.9rem", color: "var(--tourex-text-navy)", outline: "none" }}
+                    placeholder="E.g. CONG TY CO PHAN DU LICH PHU QUOC"
+                  />
+                </div>
+
+                {/* Bank Code / ID for VietQR */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--tourex-text-navy)" }}>
+                    {isEn ? "Bank Provider (for dynamic VietQR API)" : "Mã ngân hàng (dùng để sinh VietQR tự động)"}
+                  </label>
+                  <select
+                    value={bankIdVal}
+                    onChange={(e) => setBankIdVal(e.target.value)}
+                    style={{ padding: "10px 14px", borderRadius: "8px", border: "1px solid #cbd5e1", fontSize: "0.9rem", background: "#fff", color: "var(--tourex-text-navy)", outline: "none" }}
+                  >
+                    <option value="mb">MB Bank</option>
+                    <option value="vcb">Vietcombank</option>
+                    <option value="tcb">Techcombank</option>
+                    <option value="acb">ACB</option>
+                    <option value="bidv">BIDV</option>
+                    <option value="ctg">VietinBank</option>
+                    <option value="vpb">VPBank</option>
+                    <option value="tpam">TPBank</option>
+                  </select>
+                </div>
+
+                {/* QR Generation Type */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px", borderTop: "1px solid rgba(100, 64, 251, 0.08)", paddingTop: "20px", marginTop: "10px" }}>
+                  <label style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--tourex-text-navy)" }}>
+                    {isEn ? "QR Presentation Mode" : "Phương thức hiển thị ảnh QR"}
+                  </label>
+                  <div style={{ display: "flex", gap: "24px" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", cursor: "pointer", color: "var(--tourex-text-navy)" }}>
+                      <input 
+                        type="radio" 
+                        name="qrType" 
+                        value="api" 
+                        checked={qrTypeVal === "api"}
+                        onChange={() => setQrTypeVal("api")} 
+                      />
+                      {isEn ? "Auto-generated Dynamic VietQR API" : "Mã QR VietQR sinh động tự động theo số tiền"}
+                    </label>
+                    <label style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "0.85rem", cursor: "pointer", color: "var(--tourex-text-navy)" }}>
+                      <input 
+                        type="radio" 
+                        name="qrType" 
+                        value="custom" 
+                        checked={qrTypeVal === "custom"}
+                        onChange={() => setQrTypeVal("custom")} 
+                      />
+                      {isEn ? "Manual Upload Custom QR Image" : "Tải ảnh QR tĩnh cố định thủ công"}
+                    </label>
+                  </div>
+                </div>
+
+                {/* Custom QR Image file upload or URL paste */}
+                {qrTypeVal === "custom" && (
+                  <div style={{ background: "#f8fafc", padding: "16px", borderRadius: "10px", border: "1px dashed rgba(100, 64, 251, 0.15)", display: "flex", flexDirection: "column", gap: "12px" }}>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <label style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--tourex-text-slate)" }}>
+                        {isEn ? "Option A: Upload QR Image file from computer" : "Cách A: Tải file ảnh QR của bạn từ máy tính"}
+                      </label>
+                      <input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        style={{ fontSize: "0.8rem", color: "var(--tourex-text-navy)" }}
+                      />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                      <label style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--tourex-text-slate)" }}>
+                        {isEn ? "Option B: Paste Custom QR Image URL link" : "Cách B: Nhập trực tiếp URL liên kết ảnh QR tĩnh"}
+                      </label>
+                      <input 
+                        type="text" 
+                        value={customQrUrlVal}
+                        onChange={(e) => setCustomQrUrlVal(e.target.value)}
+                        style={{ padding: "8px 12px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "0.85rem", color: "var(--tourex-text-navy)", outline: "none" }}
+                        placeholder="E.g. https://i.imgur.com/your-qr.png"
+                      />
+                    </div>
+                    {/* Preview QR */}
+                    {(customQrUrlVal || base64QrVal) && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                        <span style={{ fontSize: "0.78rem", color: "var(--tourex-text-slate)" }}>{isEn ? "Preview Custom QR Image:" : "Xem trước ảnh QR đã chọn:"}</span>
+                        <img 
+                          src={base64QrVal || customQrUrlVal} 
+                          alt="Custom QR Preview" 
+                          style={{ maxWidth: "150px", height: "auto", border: "1px solid #e2e8f0", borderRadius: "6px", background: "#fff", padding: "6px" }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Save Button */}
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleSaveSettings}
+                  style={{ background: "var(--tourex-primary)", color: "var(--white)", padding: "12px 20px", borderRadius: "8px", fontWeight: "bold", fontSize: "0.9rem", alignSelf: "flex-start", marginTop: "10px", display: "flex", alignItems: "center", gap: "6px", border: "none", cursor: "pointer" }}
+                >
+                  <Check size={16} /> {isEn ? "Save Payment Settings" : "Lưu cấu hình thanh toán"}
+                </button>
+              </div>
             </div>
           )}
         </div>

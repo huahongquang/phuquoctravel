@@ -37,6 +37,7 @@ export default function App() {
   const [tours, setTours] = useState(() => apiService.getTours());
   const [blogs, setBlogs] = useState(() => apiService.getBlogs());
   const [guides, setGuides] = useState(() => apiService.getGuides());
+  const [settings, setSettings] = useState(() => apiService.getSettings());
 
   // Cart & checkout states
   const [cart, setCart] = useState([]);
@@ -227,6 +228,11 @@ export default function App() {
     setModalView("receipt");
   };
 
+  const handleUpdatePaymentSettings = (newSettings) => {
+    setSettings(newSettings);
+    apiService.saveSettings(newSettings);
+  };
+
   // --- SECURE AUTH PORTAL HANDLERS ---
   const handlePortalLogin = (e) => {
     e.preventDefault();
@@ -298,6 +304,8 @@ export default function App() {
         guides={guides}
         onAddGuide={handleAddGuide}
         onDeleteGuide={handleDeleteGuide}
+        paymentSettings={settings}
+        onUpdatePaymentSettings={handleUpdatePaymentSettings}
       />
     );
   }
@@ -409,6 +417,7 @@ export default function App() {
         bookingDetails={bookingDetails}
         language={language}
         onConfirmPayment={handleConfirmPayment}
+        paymentSettings={settings}
       />
 
       {/* PORTAL LOGIN MODAL (Username & Password) */}

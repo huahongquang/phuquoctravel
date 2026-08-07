@@ -12,7 +12,8 @@ export default function BookingModal({
   onCheckoutSubmit,
   bookingDetails, // Details of completed booking for receipt
   language,
-  onConfirmPayment
+  onConfirmPayment,
+  paymentSettings
 }) {
   const t = translations[language || "vi"];
   const isEn = language === "en";
@@ -21,6 +22,13 @@ export default function BookingModal({
     if (language === "en") return en;
     return hi || en;
   };
+
+  const bankName = paymentSettings?.bankName || "MB Bank (Ngân hàng Quân đội)";
+  const accountNo = paymentSettings?.accountNo || "0987654321";
+  const accountName = paymentSettings?.accountName || "CONG TY CO PHAN DU LICH PHU QUOC";
+  const bankId = paymentSettings?.bankId || "mb";
+  const qrType = paymentSettings?.qrType || "api";
+  const customQr = paymentSettings?.base64Qr || paymentSettings?.customQrUrl || "";
 
   // Add to cart form state
   const [date, setDate] = useState("");
@@ -439,8 +447,8 @@ export default function BookingModal({
                     {/* QR MB VietQR */}
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "#fff", padding: "12px", borderRadius: "10px", border: "1px solid rgba(0,0,0,0.05)" }}>
                       <img
-                        src={`https://img.vietqr.io/image/mb-0987654321-compact.png?amount=${bookingDetails.totalAmount}&addInfo=${bookingDetails.bookingId}&accountName=PHU%20QUOC%20TRAVEL`}
-                        alt="MB Bank VietQR Code"
+                        src={qrType === "custom" && customQr ? customQr : `https://img.vietqr.io/image/${bankId}-${accountNo}-compact.png?amount=${bookingDetails.totalAmount}&addInfo=${bookingDetails.bookingId}&accountName=${encodeURIComponent(accountName)}`}
+                        alt="Bank Transfer QR Code"
                         style={{ width: "100%", maxHeight: "170px", objectFit: "contain" }}
                       />
                       <span style={{ fontSize: "0.68rem", color: "var(--text-muted)", marginTop: "8px", fontWeight: 600 }}>Quét mã QR để chuyển khoản nhanh</span>
@@ -450,9 +458,9 @@ export default function BookingModal({
                     <div>
                       <h5 style={{ margin: "0 0 10px 0", color: "var(--primary)", fontSize: "0.85rem", fontWeight: 700 }}>{t.bank_title}</h5>
                       <div style={{ display: "flex", flexDirection: "column", gap: "6px", fontSize: "0.78rem", color: "var(--text)" }}>
-                        <div><strong>Ngân hàng:</strong> MB Bank (Ngân hàng Quân đội)</div>
-                        <div><strong>{t.bank_account_no}</strong> 0987654321</div>
-                        <div><strong>{t.bank_account_name}</strong> CONG TY CO PHAN DU LICH PHU QUOC</div>
+                        <div><strong>Ngân hàng:</strong> {bankName}</div>
+                        <div><strong>{t.bank_account_no}</strong> {accountNo}</div>
+                        <div><strong>{t.bank_account_name}</strong> {accountName}</div>
                         <div><strong>{t.bank_amount}</strong> <span style={{ color: "var(--secondary)", fontWeight: 700 }}>{formatPrice(bookingDetails.totalAmount)} đ</span></div>
                         <div><strong>{t.bank_memo}</strong> <span style={{ background: "rgba(255, 183, 3, 0.15)", padding: "2px 6px", borderRadius: "4px", fontWeight: 700, color: "var(--primary)" }}>{bookingDetails.bookingId}</span></div>
                       </div>

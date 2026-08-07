@@ -8,7 +8,8 @@ const KEYS = {
   DB_SERVICES: "pq_db_services",
   BLOGS: "pq_blogs",
   GUIDES: "pq_guides",
-  BOOKINGS: "pq_bookings"
+  BOOKINGS: "pq_bookings",
+  SETTINGS: "pq_settings"
 };
 
 export const apiService = {
@@ -37,6 +38,20 @@ export const apiService = {
     let bookings = localStorage.getItem(KEYS.BOOKINGS);
     if (!bookings) {
       localStorage.setItem(KEYS.BOOKINGS, JSON.stringify([]));
+    }
+
+    let settings = localStorage.getItem(KEYS.SETTINGS);
+    if (!settings) {
+      const defaultSettings = {
+        bankName: "MB Bank (Ngân hàng Quân đội)",
+        accountNo: "0987654321",
+        accountName: "CONG TY CO PHAN DU LICH PHU QUOC",
+        qrType: "api",
+        customQrUrl: "",
+        base64Qr: "",
+        bankId: "mb"
+      };
+      localStorage.setItem(KEYS.SETTINGS, JSON.stringify(defaultSettings));
     }
   },
 
@@ -80,5 +95,27 @@ export const apiService = {
 
   saveBookings(bookings) {
     localStorage.setItem(KEYS.BOOKINGS, JSON.stringify(bookings));
+  },
+
+  getSettings() {
+    const defaultSettings = {
+      bankName: "MB Bank (Ngân hàng Quân đội)",
+      accountNo: "0987654321",
+      accountName: "CONG TY CO PHAN DU LICH PHU QUOC",
+      qrType: "api",
+      customQrUrl: "",
+      base64Qr: "",
+      bankId: "mb"
+    };
+    try {
+      const stored = localStorage.getItem(KEYS.SETTINGS);
+      return stored ? JSON.parse(stored) : defaultSettings;
+    } catch (e) {
+      return defaultSettings;
+    }
+  },
+
+  saveSettings(settings) {
+    localStorage.setItem(KEYS.SETTINGS, JSON.stringify(settings));
   }
 };
